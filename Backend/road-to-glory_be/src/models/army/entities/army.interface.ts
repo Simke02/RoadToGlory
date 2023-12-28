@@ -1,4 +1,6 @@
-export interface Army{
+import { Player } from "src/models/player/entities/player.entity";
+
+export interface ArmyI{
     id:number;
     image:string;
     x_coordinate:number;
@@ -7,4 +9,6 @@ export interface Army{
     damage:number;
     type:string;
     range:number;
+    player:Player;
+    speed:number;
 }
