@@ -2,10 +2,12 @@ import { Army } from "src/models/army/entities/army.entity";
 import { GameObject } from "src/models/game_object/entities/game_object.entity";
 import { Material } from "src/models/materials/entities/material.entity";
 
-export interface Player{
+export interface PlayerI{
     id:number;
-    materials:Material;
-    army:Army;
-    gameObjects:GameObject;
-    //dodati za osvojene stvari
+    name:string;
+    lastName:string;
+    materials:Material[];
+    armies:Army[];
+    gameObjects:GameObject[];
+    conqured:GameObject[];
 }

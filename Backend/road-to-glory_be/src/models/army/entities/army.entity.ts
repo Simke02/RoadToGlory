@@ -1,12 +1,11 @@
-import { Column, PrimaryGeneratedColumn } from "typeorm";
+import { Player } from "src/models/player/entities/player.entity";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
+@Entity()
 export class Army {
     @PrimaryGeneratedColumn()
     id:number;
     
-    @Column({type:"varchar", length:128})
-    tip:string;
-
     @Column({type:"varchar", length:128})
     image:string;
 
@@ -27,4 +26,11 @@ export class Army {
 
     @Column({type:"integer"})
     range:number;
+
+    
+    @Column({type:"integer"})
+    speed:number;
+
+    @ManyToOne(()=>Player, (player)=>player.armies)
+    player:Player;
 }

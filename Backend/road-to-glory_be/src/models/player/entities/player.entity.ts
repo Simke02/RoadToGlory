@@ -1,23 +1,31 @@
 import { Army } from "src/models/army/entities/army.entity";
 import { GameObject } from "src/models/game_object/entities/game_object.entity";
 import { Material } from "src/models/materials/entities/material.entity";
-import { ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
-
+@Entity()
 export class Player {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToMany(()=>Material)
-    materials:Material;
+    @Column({type:"varchar", length:128})
+    name:string;
 
-    @ManyToOne(()=>Army)
-    army:Army;
+    @Column({type:"varchar", length:128})
+    lastName:string;
 
-    @ManyToOne(()=>GameObject)
-    gameObjects:GameObject;
+    @OneToMany(()=>Army, (army)=>army.player)
+    armies:Army[]
+
+    @OneToMany(()=>GameObject, (gameObject)=>gameObject.player)
+    gameObjects:GameObject[];
 
     //ovde treba osvojene stvari dodati
+    @OneToMany(()=>GameObject, (gameObject)=>gameObject.player)
+    conqured:GameObject[];
 
-    
+    @OneToMany(()=>Material, (material)=>material.player)
+    materials:Material[]
+
+
 }

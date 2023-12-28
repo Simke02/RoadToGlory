@@ -9,7 +9,7 @@ export class MaterialsController {
 
   @Post()
   create(@Body() createMaterialDto: CreateMaterialDto) {
-    return this.materialsService.create(createMaterialDto);
+    return this.materialsService.AddMaterial(createMaterialDto);
   }
 
   @Get()
