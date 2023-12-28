@@ -20,7 +20,7 @@ export class GameObject {
     x_coordinate: number;
     
     @Column({type:"integer"})
-    y_coordinate:number
+    y_coordinate:number;
 
     @Column({type:"varchar", length: 128})
     image:string;

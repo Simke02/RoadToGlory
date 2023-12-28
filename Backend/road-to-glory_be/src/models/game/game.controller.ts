@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
 import { GameService } from './game.service';
 import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
+import { ApiParam } from '@nestjs/swagger';
+import { Observable } from 'rxjs';
 
 @Controller('game')
 export class GameController {
@@ -9,7 +11,7 @@ export class GameController {
 
   @Post()
   create(@Body() createGameDto: CreateGameDto) {
-    return this.gameService.create(createGameDto);
+    return this.gameService.AddGame(createGameDto);
   }
 
   @Get()
@@ -18,17 +20,20 @@ export class GameController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.gameService.findOne(+id);
+  @ApiParam({ name: "id", type: "number" })
+  findOne(@Param('id') id: number) {
+    return this.gameService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateGameDto: UpdateGameDto) {
-    return this.gameService.update(+id, updateGameDto);
+  @Put('update/:id')
+  @ApiParam({ name: "id", type: "number" })
+  update(@Param('id') id: number, @Body() updateGameDto: UpdateGameDto) {
+    return this.gameService.update(id, updateGameDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.gameService.remove(+id);
+  @Delete('delete/:id')
+  @ApiParam({ name: "id", type: "number" })
+  remove(@Param('id') id: number) {
+    return this.gameService.remove(id);
   }
 }

@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
 import { ArmyService } from './army.service';
 import { CreateArmyDto } from './dto/create-army.dto';
 import { UpdateArmyDto } from './dto/update-army.dto';
+import { ApiParam } from '@nestjs/swagger';
 
 @Controller('army')
 export class ArmyController {
@@ -9,7 +10,7 @@ export class ArmyController {
 
   @Post()
   create(@Body() createArmyDto: CreateArmyDto) {
-    return this.armyService.create(createArmyDto);
+    return this.armyService.AddArmy(createArmyDto);
   }
 
   @Get()
@@ -17,18 +18,21 @@ export class ArmyController {
     return this.armyService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.armyService.findOne(+id);
+  @Get('get/:id')
+  @ApiParam({ name: "id", type: "number" })
+  findOne(@Param('id') id: number) {
+    return this.armyService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateArmyDto: UpdateArmyDto) {
-    return this.armyService.update(+id, updateArmyDto);
+  @Put('update/:id')
+  @ApiParam({ name: "id", type: "number" })
+  update(@Param('id') id: number, @Body() updateArmyDto: UpdateArmyDto) {
+    return this.armyService.update(id, updateArmyDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.armyService.remove(+id);
+  @Delete('delete/:id')
+  @ApiParam({ name: "id", type: "number" })
+  remove(@Param('id') id: number) {
+    return this.armyService.remove(id);
   }
 }

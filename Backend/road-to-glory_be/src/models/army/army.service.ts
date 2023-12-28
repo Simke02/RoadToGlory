@@ -1,26 +1,41 @@
 import { Injectable } from '@nestjs/common';
 import { CreateArmyDto } from './dto/create-army.dto';
 import { UpdateArmyDto } from './dto/update-army.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Army } from './entities/army.entity';
+import { Repository } from 'typeorm';
+import { find, from } from 'rxjs';
+import { ForeignKeyMetadata } from 'typeorm/metadata/ForeignKeyMetadata';
 
 @Injectable()
 export class ArmyService {
-  create(createArmyDto: CreateArmyDto) {
-    return 'This action adds a new army';
+
+  constructor(
+    @InjectRepository(Army)
+    private armyRepository:Repository<Army>
+  ){}
+
+  AddArmy(createArmyDto: CreateArmyDto) {
+    return from(this.armyRepository.save(createArmyDto));
   }
 
   findAll() {
-    return `This action returns all army`;
+    return from(this.armyRepository.find());
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} army`;
+  async findOne(id: number) {
+    const army = await from(this.armyRepository.findOne({
+      where:{id:id}
+    }))
+    return army;
   }
 
-  update(id: number, updateArmyDto: UpdateArmyDto) {
-    return `This action updates a #${id} army`;
+  async update(id: number, updateArmyDto: UpdateArmyDto) {
+    await this.armyRepository.update(id, updateArmyDto);
+    return this.findOne(id);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} army`;
+    return this.armyRepository.delete(id)
   }
 }

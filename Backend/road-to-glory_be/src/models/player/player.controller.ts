@@ -16,22 +16,22 @@ export class PlayerController {
     ) {}
 
   @Post()
-  AddPlayer(@Body() createPlayerDto: CreatePlayerDto):Observable<CreatePlayerDto> {
+  create(@Body() createPlayerDto: CreatePlayerDto):Observable<CreatePlayerDto> {
     return this.playerService.AddPlayer(createPlayerDto);
   }
 
-  @Get()
+  @Get('get')
   findAll() {
     return this.playerService.findAll();
   }
 
-  @Get(':id')
+  @Get('get/:id')
   @ApiParam({ name: "id", type: "number" })
   findOne(@Param('id') id: number) {
     return this.playerService.findOne(id);
   }
 
-  @Put(':id')
+  @Put('update/:id')
   @ApiParam({ name: "id", type: "number" })
   update(@Param('id') id: number, @Body() updatePlayerDto: UpdatePlayerDto) {
     return this.playerService.update(id, updatePlayerDto);
