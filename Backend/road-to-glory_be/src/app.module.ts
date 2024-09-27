@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { PersistenceModule } from './persistence/persistence.module';
 import { CommunicationModule } from './communication/communication.module';
 import { GameObjectModule } from './game_object/game_object.module';
+import { UserService } from './common/providers/user/user.service';
 
 @Module({
   imports: [
@@ -23,6 +24,6 @@ import { GameObjectModule } from './game_object/game_object.module';
     GameObjectModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, UserService],
 })
 export class AppModule {}
