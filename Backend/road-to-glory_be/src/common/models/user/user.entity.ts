@@ -23,10 +23,6 @@ export class User{
     @Column("varchar", { name: "last_name", length: 128 })
     lastName: string;
   
-    @AutoMap()
-    @Column({ name: "activated", type: "boolean" })
-    activated: boolean;
-  
     @BeforeInsert()
     private hashPassword() {
       this.password = bcrypt.hashSync(this.password, 10);

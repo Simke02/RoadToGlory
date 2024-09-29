@@ -7,6 +7,4 @@ export class MeUserInfoDto {
   firstName: string;
   @AutoMap()
   lastName: string;
-  @AutoMap()
-  activated: boolean;
 }

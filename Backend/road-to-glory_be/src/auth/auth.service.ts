@@ -33,8 +33,7 @@ export class AuthService {
     return[
       this.classMapper.map(potentialUser, User, MeUserInfoDto),
       this.jwtService.sign({
-        username:potentialUser.username,
-        activated:potentialUser.activated
+        username:potentialUser.username
       }),
     ]
   }
