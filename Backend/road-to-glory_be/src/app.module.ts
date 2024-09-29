@@ -8,6 +8,7 @@ import { PersistenceModule } from './persistence/persistence.module';
 import { CommunicationModule } from './communication/communication.module';
 import { GameObjectModule } from './game_object/game_object.module';
 import { MapModule } from './common/providers/map/map.module';
+import { UserService } from './common/providers/user/user.service';
 
 @Module({
   imports: [
@@ -25,6 +26,6 @@ import { MapModule } from './common/providers/map/map.module';
     MapModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, UserService],
 })
 export class AppModule {}
