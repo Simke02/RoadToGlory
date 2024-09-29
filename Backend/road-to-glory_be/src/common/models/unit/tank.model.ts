@@ -1,12 +1,13 @@
-import { Unit } from "./unit.entity";
+import { Unit } from "./unit.model";
 
 export class Tank implements Unit{
-    terrain: string;
+    can_attack: boolean;
     x_coor: number;
     y_coor: number;
     health: number;
     strenght: number;
     range: number;
+    steps: number;
+    steps_left: number;
     upgrade: string;
-    
 }

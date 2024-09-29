@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { PersistenceModule } from './persistence/persistence.module';
 import { CommunicationModule } from './communication/communication.module';
 import { GameObjectModule } from './game_object/game_object.module';
+import { MapModule } from './common/providers/map/map.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { GameObjectModule } from './game_object/game_object.module';
     AuthModule,
     PersistenceModule,
     CommunicationModule,
-    GameObjectModule
+    GameObjectModule,
+    MapModule
   ],
   controllers: [AppController],
   providers: [AppService],
