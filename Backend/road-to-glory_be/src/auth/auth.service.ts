@@ -1,26 +1,42 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { UserService } from 'src/common/providers/user/user.service';
+import { JwtService } from '@nestjs/jwt';
+import { Mapper } from "@automapper/core"
+import { InjectMapper } from "@automapper/nestjs"
+import { UserNotFoundException } from 'src/common/exceptions/user-not-found.exception';
+import { PasswordNotValidException } from 'src/common/exceptions/password-not-valid.exception';
+import { User } from 'src/common/models/user/user.entity';
+import * as bcrypt from "bcrypt";
+import { MeUserInfoDto } from 'src/common/models/user/dto/me-user-info.dto';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+
+  constructor(
+    private userService: UserService,
+    @InjectMapper() private readonly classMapper:Mapper,
+    private jwtService: JwtService,
+  ){}
+
+  async auth(username: string, password: string): Promise<[MeUserInfoDto, string]> {
+    const potentialUser = await this.userService.findUserByUsername(username);
+    if(!potentialUser){
+      throw new UserNotFoundException();
+    }
+    const isPasswordMatch = await bcrypt.compare(
+      password,
+      potentialUser.password
+    );
+    if (!isPasswordMatch) {
+      throw new PasswordNotValidException();
+    }
+    return[
+      this.classMapper.map(potentialUser, User, MeUserInfoDto),
+      this.jwtService.sign({
+        username:potentialUser.username,
+        activated:potentialUser.activated
+      }),
+    ]
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
-  }
 }
