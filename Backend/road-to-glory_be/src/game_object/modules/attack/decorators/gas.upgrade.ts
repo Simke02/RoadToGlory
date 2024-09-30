@@ -1,4 +1,4 @@
-import { Unit } from "src/common/models/unit/unit.entity";
+import { Unit } from "src/common/models/unit/unit.model";
 import { AttackStrategy } from "../strategies/attack.strategy";
 import { UpgradeDecorator } from "./upgrade.decorator";
 

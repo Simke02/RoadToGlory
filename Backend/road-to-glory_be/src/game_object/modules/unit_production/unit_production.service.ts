@@ -5,7 +5,7 @@ import { UnitProductionChooser } from './unit_production.chooser';
 @Injectable()
 export class UnitProductionService {
     
-    chooser: UnitProductionChooser;
+    private chooser: UnitProductionChooser;
     
     constructor() {
         this.chooser = new UnitProductionChooser();

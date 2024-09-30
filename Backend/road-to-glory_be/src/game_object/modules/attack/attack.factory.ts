@@ -11,6 +11,7 @@ import { LakePlainsAttack } from "./strategies/lake_plains.attack";
 import { PlainsForestAttack } from "./strategies/plains_forest.attack";
 import { PlainsHillsAttack } from "./strategies/plains_hills.attack";
 import { PlainLakeAttack } from "./strategies/plains_lake.attack";
+import { RangedAttack } from "./strategies/ranged.attack";
 import { SameSameAttack } from "./strategies/same_same.attack";
 
 export class AttackFactory{
@@ -27,7 +28,8 @@ export class AttackFactory{
         forest_plains: new ForestPlainsAttack(),
         lake_forest: new LakeForestAttack(),
         lake_hills: new LakeHillsAttack(),
-        lake_plains: new LakePlainsAttack()
+        lake_plains: new LakePlainsAttack(),
+        ranged: new RangedAttack()
     };
 
     createAttack(terrainType: string): AttackStrategy{

@@ -1,51 +1,29 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Unit } from 'src/common/models/unit/unit.model';
-import { AttackFactory } from './attack.factory';
-import { UpgradeFactory } from './upgrade.factory';
+import { DestroyFactory } from './destroy.factory';
 import { Map } from 'src/common/providers/map/map';
-import { AttackStrategy } from './strategies/attack.strategy';
+import { Unit } from 'src/common/models/unit/unit.model';
+import { BasicFacility } from 'src/common/models/basic_facility.model';
+import { DestroyStrategy } from './strategies/destroy.strategy';
 import { PositionStep } from 'src/common/models/position/position_step.model';
 
 @Injectable()
-export class AttackService {
-    private attack_factory: AttackFactory;
-    private upgrade_factory: UpgradeFactory;
+export class DestroyService {
+    private destroy_factory: DestroyFactory;
 
     constructor(@Inject('MAP') private readonly map: Map) {
-        this.attack_factory = new AttackFactory();
-        this.upgrade_factory = new UpgradeFactory();
+        this.destroy_factory = new DestroyFactory();
     }
 
     //Izvrsavanje konkretnog napada
-    attack(attacker: Unit, defender: Unit): { attacker: Unit; defender: Unit; } {
-        let terrain_type;
+    destroy(attacker: Unit, object: BasicFacility): { attacker: Unit; object: BasicFacility } {
 
-        //RUZNOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-        //Ne svidja mi se ovo resenje!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        if(attacker.range > 1){
-            terrain_type = "ranged";
-        }
-        else{
-            terrain_type = this.map.getPosition(attacker.x_coor, attacker.y_coor).terrain;
-            terrain_type += "_"
-            terrain_type = this.map.getPosition(defender.x_coor, defender.y_coor).terrain;
-        }
-
-        const attack_strategy: AttackStrategy = this.attack_factory.createAttack(terrain_type);
-
-        //Razmisli da zamenis sa none upgrade decoratorom!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        if(attacker.upgrade = "none") {
-            return attack_strategy.attack(attacker, defender);
-        }
-        else {
-            const upgrade_decorator = this.upgrade_factory.chooseUpgrade(attacker.upgrade, attack_strategy);
-            return upgrade_decorator.attack(attacker, defender);
-        }
+        const destroy_strategy: DestroyStrategy = this.destroy_factory.createDestroy(attacker.upgrade);
+        return destroy_strategy.destroy(attacker, object);
     }
 
-    //Sve jedinice koje jedinica moze da napadne
-    whatCanUnitAttack(unit: Unit, enemy_units: Unit[]): Unit[] {
-        let units_in_range: Unit[];
+    //Svi objekti koje jedinica moze da napadne
+    whatCanUnitDestroy(unit: Unit, enemy_objects: BasicFacility[]): BasicFacility[] {
+        let objects_in_range: BasicFacility[];
 
         let visited: PositionStep[] = [];
         let just_added: PositionStep[] = [];
@@ -58,12 +36,12 @@ export class AttackService {
             let current: PositionStep = just_added.pop();
 
             //Provera da li je na toj poziciji neprijatelj
-            let unit_in_range = enemy_units.find(enemy_unit =>
-                enemy_unit.x_coor == current.x_coor && enemy_unit.y_coor == current.y_coor
+            let object_in_range = enemy_objects.find(enemy_object =>
+                enemy_object.x_coor == current.x_coor && enemy_object.y_coor == current.y_coor
             );
 
-            if(unit_in_range)
-                units_in_range.push(unit_in_range);
+            if(object_in_range)
+                objects_in_range.push(object_in_range);
 
             if(current.steps_left == 0){
                 continue;
@@ -91,7 +69,7 @@ export class AttackService {
             }
         }
 
-        return units_in_range;
+        return objects_in_range;
     }
 
         //Odradi proveru da li postoje polja pored current i sve koje postoje dodaj

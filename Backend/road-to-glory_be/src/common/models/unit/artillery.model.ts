@@ -1,7 +1,7 @@
 import { Unit } from "./unit.model";
 
 export class Artillery implements Unit{
-    can_attack: boolean;
+    finished_turn: boolean;
     x_coor: number;
     y_coor: number;
     health: number;

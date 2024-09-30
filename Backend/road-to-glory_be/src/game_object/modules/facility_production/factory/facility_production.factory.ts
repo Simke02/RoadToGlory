@@ -20,18 +20,18 @@ export class FacilityProductionFactory{
     }
 
     //Proizvodnja objekta za proizvodnju
-    produceFacility(what_facility: string): Facility{
+    produceFacility(what_facility: string, x_coor: number, y_coor): Facility{
         let facility: Facility;
 
         switch(what_facility) {
             case "barracks":
-                facility = new Barracks();
+                facility = new Barracks(x_coor, y_coor);
                 break;
             case "tank_plant":
-                facility = new TankPlant();
+                facility = new TankPlant(x_coor, y_coor);
                 break;
             case "artillery_plant":
-                facility = new ArtilleryPlant();
+                facility = new ArtilleryPlant(x_coor, y_coor);
                 break;
         }
 

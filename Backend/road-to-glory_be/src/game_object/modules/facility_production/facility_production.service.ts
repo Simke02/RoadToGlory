@@ -5,15 +5,15 @@ import { Facility } from 'src/common/models/facility/facility.model';
 @Injectable()
 export class FacilityProductionService {
 
-    production_factory: FacilityProductionFactory;
+    private production_factory: FacilityProductionFactory;
     
     constructor(){
         this.production_factory = new FacilityProductionFactory();
     }
 
     //Proizvodnja objekta za proizvodnju
-    produceFacility(what_facility: string): Facility{
-        return this.production_factory.produceFacility(what_facility);
+    produceFacility(what_facility: string, x_coor: number, y_coor: number): Facility{
+        return this.production_factory.produceFacility(what_facility, x_coor, y_coor);
     }
 
     //Vracanje opisa za sve proizvodnje koje mogu da se naprave
