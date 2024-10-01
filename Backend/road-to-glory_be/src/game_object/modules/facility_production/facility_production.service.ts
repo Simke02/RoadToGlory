@@ -17,7 +17,7 @@ export class FacilityProductionService {
     }
 
     //Vracanje opisa za sve proizvodnje koje mogu da se naprave
-    facilitiesDescription(): {facility_name: string[], iron_cost: number[]} {
+    facilitiesDescription(): {facility_name: string[], gold_cost: number[]} {
         return this.production_factory.facilitiesDescription();
     }
 }

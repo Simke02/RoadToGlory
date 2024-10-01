@@ -9,6 +9,8 @@ import { Map } from 'src/common/providers/map/map';
 import { Unit } from 'src/common/models/unit/unit.model';
 import { BasicFacility } from 'src/common/models/basic_facility.model';
 import { PositionStep } from 'src/common/models/position/position_step.model';
+import { UpgradeService } from './modules/upgrade/upgrade.service';
+import { Upgrade } from 'src/common/models/upgrade/upgrade.model';
 
 @Injectable()
 export class GameObjectService {
@@ -18,6 +20,7 @@ export class GameObjectService {
   private movement_service: MovementService;
   private resource_facility_production_service: ResourceFacilityProductionService;
   private unit_production_service: UnitProductionService;
+  private upgrade_service: UpgradeService;
 
   //Potencijalni atributi
   private player: string;
@@ -29,13 +32,23 @@ export class GameObjectService {
     this.movement_service = new MovementService(map);
     this.resource_facility_production_service = new ResourceFacilityProductionService();
     this.unit_production_service = new UnitProductionService();
+    this.upgrade_service = new UpgradeService();
 
     this.player = "";
   }
 
   //Sta moze da bude izgradjeno na jednom polju
-  whatCanBeBuilt(): {facility_name: string[], iron_cost: number[]} {
-    return this.facility_production_service.facilitiesDescription();
+  whatCanBeBuilt(): {building_names: string[], gold_cost: number[]} {
+    const facilities = this.facility_production_service.facilitiesDescription();
+    const resource_facilities = this.resource_facility_production_service.resourceFacilitiesDescription();
+
+    const building_names = [...facilities.facility_name, ...resource_facilities.resource_facility_name];
+    const gold_cost = [...facilities.gold_cost, ...resource_facilities.gold_cost];
+
+    return {
+      building_names,
+      gold_cost
+    };
   }
 
   //Gde sve moze da ide jedinica i sta moze da napada i unistava
@@ -78,17 +91,29 @@ export class GameObjectService {
   }
 
   //Pravljenje objekta
-  produceFacility(facility_type: string, facility_name: string, x_coor: number, y_coor: number): BasicFacility {
-    if(facility_type == "production") {
-      return this.facility_production_service.produceFacility(facility_name, x_coor, y_coor);
+  produceFacility(facility_identificator: string, x_coor: number, y_coor: number): BasicFacility {
+    const result = facility_identificator.split('_');
+
+    if(result[0] == "p") {
+      return this.facility_production_service.produceFacility(result[1], x_coor, y_coor);
     }
-    else if(facility_type == "resources") {
-      return this.resource_facility_production_service.produceResourceFacility(facility_name, x_coor, y_coor);
+    else if(result[0] == "r") {
+      return this.resource_facility_production_service.produceResourceFacility(result[1], x_coor, y_coor);
     }
   }
 
   //Treba mi SignalR za to
   nextTurn(){
 
+  }
+
+  //Koji svi upgradovi mogu da se izuce
+  whatUpgradesExist(): {upgrade_name: string[], gold_cost: number[]} {
+    return this.upgrade_service.upgradeDescription();
+  }
+
+  //Vraca izuceni upgrade
+  researchUpgrade(what_upgrade: string): Upgrade {
+    return this.upgrade_service.researchUpgrade(what_upgrade);
   }
 }

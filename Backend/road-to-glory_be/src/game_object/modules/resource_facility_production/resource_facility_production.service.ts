@@ -16,7 +16,7 @@ export class ResourceFacilityProductionService {
     }
 
     //Vracanje opisa za sve objekte za skupljanje resursa koje mogu da se naprave
-    resourceFacilitiesDescription(): {resource_facility_name: string[], iron_cost: number[]} {
+    resourceFacilitiesDescription(): {resource_facility_name: string[], gold_cost: number[]} {
         return this.production_factory.resourceFacilitiesDescription();
     }
 }

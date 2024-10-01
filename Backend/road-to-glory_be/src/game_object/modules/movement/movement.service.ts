@@ -4,13 +4,16 @@ import { Unit } from 'src/common/models/unit/unit.model';
 import { Map } from 'src/common/providers/map/map';
 import { MovementStrategy } from './strategies/movement.strategy';
 import { PositionStep } from 'src/common/models/position/position_step.model';
+import { NeighboursService } from 'src/common/providers/map/neighbours.service';
 
 @Injectable()
 export class MovementService {
     private movement_factory: MovementFactory;
+    private neighbours_service: NeighboursService;
 
     constructor(@Inject('MAP') private readonly map: Map){
         this.movement_factory = new MovementFactory();
+        this.neighbours_service = new NeighboursService();
     }
 
     //Izvrsavanje konkretnog kretanja
@@ -43,7 +46,7 @@ export class MovementService {
             }
 
             let neighbours: PositionStep[]
-            neighbours = this.addToNeighbours(current)
+            neighbours = this.neighbours_service.addToNeighbours(current, this.map)
 
             for (let i = 0; i < neighbours.length; i++) {
                 let neighbour = neighbours[i];
@@ -73,33 +76,5 @@ export class MovementService {
         }
 
         return positions;
-    }
-
-
-    //Odradi proveru da li postoje polja pored current i sve koje postoje dodaj
-    private addToNeighbours(current: PositionStep): PositionStep[] {
-        let neighbours: PositionStep[];
-
-        neighbours = this.addIfExists(current.x_coor, current.y_coor - 1, neighbours, current.steps_left);
-        neighbours = this.addIfExists(current.x_coor - 1, current.y_coor - 1, neighbours, current.steps_left);
-        neighbours = this.addIfExists(current.x_coor - 1, current.y_coor, neighbours, current.steps_left);
-        neighbours = this.addIfExists(current.x_coor - 1, current.y_coor + 1, neighbours, current.steps_left);
-        neighbours = this.addIfExists(current.x_coor, current.y_coor + 1, neighbours, current.steps_left);
-        neighbours = this.addIfExists(current.x_coor + 1, current.y_coor + 1, neighbours, current.steps_left);
-        neighbours = this.addIfExists(current.x_coor + 1, current.y_coor, neighbours, current.steps_left);
-        neighbours = this.addIfExists(current.x_coor + 1, current.y_coor - 1, neighbours, current.steps_left);
-
-        return neighbours;
-    }
-
-    private addIfExists(x_coor: number, y_coor: number, neighbours: PositionStep[], steps_left: number): PositionStep[] {
-        if(0 <= x_coor && x_coor < this.map.getNumberOfRows()){
-            if(0 <= y_coor && y_coor < this.map.getNumberOfColumns()){
-                const result = this.map.getPosition(x_coor, y_coor);
-                neighbours.push(new PositionStep(result, steps_left));
-            }
-        }
-
-        return neighbours;
     }
 }

@@ -4,16 +4,16 @@ import { ResourceFacility } from "src/common/models/resource_facility/resource_f
 
 export class ResourceFacilityProductionFactory{
     resource_facility_name: string[];
-    iron_cost: number[];
+    gold_cost: number[];
 
     constructor() {
         this.resource_facility_name = [];
-        this.resource_facility_name.push("farm");
-        this.resource_facility_name.push("mine");
+        this.resource_facility_name.push("r_farm");
+        this.resource_facility_name.push("r_mine");
 
-        this.iron_cost = [];
-        this.iron_cost.push(10);
-        this.iron_cost.push(15);
+        this.gold_cost = [];
+        this.gold_cost.push(10);
+        this.gold_cost.push(15);
     }
 
     //Proizvodnja objekta za proizvodnju
@@ -33,7 +33,7 @@ export class ResourceFacilityProductionFactory{
     }
 
     //Vracanje opisa za sve proizvodnje koje mogu da se naprave
-    resourceFacilitiesDescription(): {resource_facility_name: string[], iron_cost: number[]} {
-        return {resource_facility_name: this.resource_facility_name, iron_cost: this.iron_cost};
+    resourceFacilitiesDescription(): {resource_facility_name: string[], gold_cost: number[]} {
+        return {resource_facility_name: this.resource_facility_name, gold_cost: this.gold_cost};
     }
 }

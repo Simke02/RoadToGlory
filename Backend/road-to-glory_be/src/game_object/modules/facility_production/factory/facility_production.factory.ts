@@ -5,18 +5,18 @@ import { TankPlant } from "src/common/models/facility/tank_plant.model";
 
 export class FacilityProductionFactory{
     facility_name: string[];
-    iron_cost: number[];
+    gold_cost: number[];
 
     constructor(){
         this.facility_name = [];
-        this.facility_name.push("barracks");
-        this.facility_name.push("tank_plant");
-        this.facility_name.push("artillery_plant");
+        this.facility_name.push("p_barracks"); //Ovo p stavljamo da bi smo mogli da razlikujemo u funkciji produceFacility iz game_obj
+        this.facility_name.push("p_tank_plant");
+        this.facility_name.push("p_artillery_plant");
 
-        this.iron_cost = [];
-        this.iron_cost.push(25);
-        this.iron_cost.push(35);
-        this.iron_cost.push(45);
+        this.gold_cost = [];
+        this.gold_cost.push(25);
+        this.gold_cost.push(35);
+        this.gold_cost.push(45);
     }
 
     //Proizvodnja objekta za proizvodnju
@@ -39,7 +39,7 @@ export class FacilityProductionFactory{
     }
 
     //Vracanje opisa za sve proizvodnje koje mogu da se naprave
-    facilitiesDescription(): {facility_name: string[], iron_cost: number[]} {
-        return {facility_name: this.facility_name, iron_cost: this.iron_cost};
+    facilitiesDescription(): {facility_name: string[], gold_cost: number[]} {
+        return {facility_name: this.facility_name, gold_cost: this.gold_cost};
     }
 }
