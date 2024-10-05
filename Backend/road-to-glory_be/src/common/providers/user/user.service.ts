@@ -3,9 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UnhandledException } from 'src/common/exceptions/unhandled.exceptio';
 import { UserAlreadyExistsException } from 'src/common/exceptions/user-already-exists.exception';
 import { User } from 'src/common/models/user/user.entity';
-import { FindOptionsRelations, Repository } from 'typeorm';
-
-
+import { Repository, FindOptionsRelations } from 'typeorm';
 
 @Injectable()
 export class UserService {
