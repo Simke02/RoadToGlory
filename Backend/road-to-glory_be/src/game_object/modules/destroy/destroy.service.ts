@@ -21,12 +21,15 @@ export class DestroyService {
     destroy(attacker: Unit, object: BasicFacility): { attacker: Unit; object: BasicFacility } {
 
         const destroy_strategy: DestroyStrategy = this.destroy_factory.createDestroy(attacker.upgrade);
-        return destroy_strategy.destroy(attacker, object);
+        let result = destroy_strategy.destroy(attacker, object);
+        result.attacker.finished_turn = true;
+        this.updateMap(result.attacker, result.object);
+        return result;
     }
 
     //Svi objekti koje jedinica moze da napadne
-    whatCanUnitDestroy(unit: Unit, enemy_objects: BasicFacility[]): BasicFacility[] {
-        let objects_in_range: BasicFacility[];
+    whatCanUnitDestroy(unit: Unit, player: string/*enemy_objects: BasicFacility[]*/): PositionStep[]/*BasicFacility[]*/ {
+        let objects_in_range: PositionStep[];//BasicFacility[];
 
         let visited: PositionStep[] = [];
         let just_added: PositionStep[] = [];
@@ -39,12 +42,17 @@ export class DestroyService {
             let current: PositionStep = just_added.pop();
 
             //Provera da li je na toj poziciji neprijatelj
-            let object_in_range = enemy_objects.find(enemy_object =>
+            /*let object_in_range = enemy_objects.find(enemy_object =>
                 enemy_object.x_coor == current.x_coor && enemy_object.y_coor == current.y_coor
-            );
+            );*/
 
-            if(object_in_range)
-                objects_in_range.push(object_in_range);
+            if(this.map.getOwner(current.x_coor, current.y_coor) !== player)
+                if(this.map.getType(current.x_coor, current.y_coor) === "facility" ||
+                    this.map.getType(current.x_coor, current.y_coor) === "resource")
+                    objects_in_range.push(current);  
+
+            /*if(object_in_range)
+                objects_in_range.push(object_in_range);*/
 
             if(current.steps_left == 0){
                 continue;
@@ -73,5 +81,17 @@ export class DestroyService {
         }
 
         return objects_in_range;
+    }
+
+    private updateMap(attacker: Unit, object: BasicFacility) {
+        if(object.health <= 0 && attacker.health <= 0){
+            this.map.setOwner(object.x_coor, object.y_coor, "");
+            this.map.setType(object.x_coor, object.y_coor, "");
+        }
+        
+        if(attacker.health <= 0){
+            this.map.setOwner(attacker.x_coor, attacker.y_coor, "");
+            this.map.setType(attacker.x_coor, attacker.y_coor, "");
+        } 
     }
 }

@@ -10,4 +10,16 @@ export class Tank implements Unit{
     steps: number;
     steps_left: number;
     upgrade: string;
+
+    constructor(x_coor: number, y_coor: number) {
+        this.finished_turn = true;
+        this.x_coor = x_coor;
+        this.y_coor = y_coor;
+        this.health = 700;
+        this.strenght = 250;
+        this.range = 1;
+        this.steps = 3;
+        this.steps_left = 0;
+        this.upgrade = "none";
+    }
 }

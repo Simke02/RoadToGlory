@@ -28,18 +28,34 @@ export class GameObjectService {
   constructor(@Inject('MAP') private readonly map: Map) {
     this.attack_service = new AttackService(map);
     this.destroy_service = new DestroyService(map);
-    this.facility_production_service = new FacilityProductionService();
+    this.facility_production_service = new FacilityProductionService(map);
     this.movement_service = new MovementService(map);
-    this.resource_facility_production_service = new ResourceFacilityProductionService();
-    this.unit_production_service = new UnitProductionService();
+    this.resource_facility_production_service = new ResourceFacilityProductionService(map);
+    this.unit_production_service = new UnitProductionService(map);
     this.upgrade_service = new UpgradeService();
 
-    this.player = "";
+    this.player = ""; //Pretpostavljamo da sadrzi username playera koji trenutno izvrsava potez
   }
 
   //Sta moze da bude izgradjeno na jednom polju
-  whatCanBeBuilt(): {building_names: string[], gold_cost: number[]} {
-    const facilities = this.facility_production_service.facilitiesDescription();
+
+  //Ovde moras da izmenis da se vrsi provera da li ga nesto ne okruzuje gde ne moze
+  whatCanBeBuilt(x_coor: number, y_coor: number): {building_names: string[], gold_cost: number[]} {
+    
+    //OVE PROVERE SAM URADIO SAMO ZA IGRACA KOJI JE LEVO, MORAS I ZA DRUGOG DA ODRADIS
+
+    if(y_coor > 0 && this.map.getType(x_coor, y_coor-1) === "facility"){
+      return {
+        building_names: [],
+        gold_cost: []
+      }
+    }
+    
+    let facilities = {facility_name: [], gold_cost: []}
+    //Moras da uradis proveru da li postoji to y
+    if(this.map.getType(x_coor, y_coor + 1) === "" || this.map.getType(x_coor, y_coor + 1) === "unit"){
+      facilities = this.facility_production_service.facilitiesDescription();
+    }
     const resource_facilities = this.resource_facility_production_service.resourceFacilitiesDescription();
 
     const building_names = [...facilities.facility_name, ...resource_facilities.resource_facility_name];
@@ -52,26 +68,31 @@ export class GameObjectService {
   }
 
   //Gde sve moze da ide jedinica i sta moze da napada i unistava
-  unitTurnPossibilities(unit: Unit, enemy_units: Unit[], enemy_objects: BasicFacility[]): 
-    {positions: PositionStep[], units_in_range: Unit[], objects_in_range: BasicFacility[]} {
+  unitTurnPossibilities(unit: Unit, /*enemy_units: Unit[], enemy_objects: BasicFacility[]*/): PositionStep[]
+    /*{positions: PositionStep[], units_in_range: Unit[], objects_in_range: BasicFacility[]}*/ {
       
       let positions = this.movement_service.whereCanUnitGo(unit);
-      let units_in_range = this.attack_service.whatCanUnitAttack(unit, enemy_units);
-      let objects_in_range = this.destroy_service.whatCanUnitDestroy(unit, enemy_objects);
-      return {positions, units_in_range, objects_in_range};
+      let units_in_range = this.attack_service.whatCanUnitAttack(unit, this.player);//enemy_units);
+      let objects_in_range = this.destroy_service.whatCanUnitDestroy(unit, this.player);//enemy_objects);
+
+      const everything = [...positions, ...units_in_range, ...objects_in_range];
+      return everything;
+      //return {positions, units_in_range, objects_in_range};
   }
 
   //Konkretan napad
   attack(attacker: Unit, defender: Unit): {attacker: Unit, defender: Unit} {
     let result = this.attack_service.attack(attacker, defender);
-    result.attacker.finished_turn = true;
+    if(result.defender.health <= 0 && result.attacker.health > 0)
+      result.attacker = this.movement_service.moveAfterAttack(result.attacker, result.defender.x_coor, result.defender.y_coor);
     return result;
   }
 
-  //Konkretni napad na objekat
+  //Konkretni napad na objekat i grad
   destroy(attacker: Unit, object: BasicFacility): {attacker: Unit, object: BasicFacility} {
     let result = this.destroy_service.destroy(attacker, object);
-    result.attacker.finished_turn = true;
+    if(result.object.health <= 0 && result.attacker.health > 0)
+      result.attacker = this.movement_service.moveAfterAttack(result.attacker, result.object.x_coor, result.object.y_coor);
     return result;
   }
 
@@ -79,15 +100,13 @@ export class GameObjectService {
   //Ideja je da mi u unitTurnPossibilities vratimo klijentu PositionStep i da kada se odluci za kretanje on vrati taj PositionStep
   move(unit: Unit, final_position: PositionStep): Unit {
     let result = this.movement_service.move(unit, final_position);
-    if(result.steps_left == 0)
-      result.finished_turn = true;
     return result;
   }
 
   //Pravljenje jedinice
-  //Moras da vidis gde ce da se napravi jedinica
-  produceUnit(unit_type: string, unit_name: string): Unit {
-    return this.unit_production_service.createUnit(unit_type, unit_name);
+  //y_coor koji se prima je za jedan veci ili manji od facility, zavisi od toga ko je na potezu
+  produceUnit(unit_type: string, unit_name: string, x_coor: number, y_coor: number): Unit {
+    return this.unit_production_service.createUnit(unit_type, unit_name, x_coor, y_coor, this.player);
   }
 
   //Pravljenje objekta
@@ -95,15 +114,22 @@ export class GameObjectService {
     const result = facility_identificator.split('_');
 
     if(result[0] == "p") {
-      return this.facility_production_service.produceFacility(result[1], x_coor, y_coor);
+      return this.facility_production_service.produceFacility(result[1], x_coor, y_coor, this.player);
     }
     else if(result[0] == "r") {
-      return this.resource_facility_production_service.produceResourceFacility(result[1], x_coor, y_coor);
+      return this.resource_facility_production_service.produceResourceFacility(result[1], x_coor, y_coor, this.player);
     }
   }
 
   //Treba mi SignalR za to
+  //Treba da resetuje za sve jedinice finish_turn
   nextTurn(){
+
+  }
+
+  //Nesto kao first turn
+  //Treba da napravi city
+  initialize(){
 
   }
 

@@ -22,6 +22,14 @@ export class Map{
         return this.positions[x_coor][y_coor].owner;
     }
 
+    setType(x_coor: number, y_coor: number, type: string) {
+        this.positions[x_coor][y_coor].type = type;
+    }
+
+    getType(x_coor: number, y_coor: number): string {
+        return this.positions[x_coor][y_coor].type;
+    }
+
     getNumberOfRows(): number {
         return this.number_of_rows;
     }

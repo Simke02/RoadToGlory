@@ -32,7 +32,7 @@ export class AttackFactory{
         ranged: new RangedAttack()
     };
 
-    createAttack(terrainType: string): AttackStrategy{
-        return this.attack_strategies[terrainType];
+    createAttack(strategy_type: string): AttackStrategy{
+        return this.attack_strategies[strategy_type];
     }
 }

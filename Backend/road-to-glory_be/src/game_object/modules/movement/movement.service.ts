@@ -20,10 +20,14 @@ export class MovementService {
     move(unit: Unit, final_position: PositionStep): Unit{
         let owner: string = this.map.getOwner(unit.x_coor, unit.y_coor);
         this.map.setOwner(unit.x_coor, unit.y_coor, "");
+        this.map.setType(unit.x_coor, unit.y_coor, "");
         unit.x_coor = final_position.x_coor;
         unit.y_coor = final_position.y_coor;
         unit.steps_left = final_position.steps_left;
+        if(unit.steps_left === 0)
+            unit.finished_turn = true;
         this.map.setOwner(unit.x_coor, unit.y_coor, owner);
+        this.map.setType(unit.x_coor, unit.y_coor, "unit");
         return unit;
     }
 
@@ -76,5 +80,16 @@ export class MovementService {
         }
 
         return positions;
+    }
+
+    moveAfterAttack(attacker: Unit, new_x: number, new_y: number): Unit {
+        let owner: string = this.map.getOwner(attacker.x_coor, attacker.y_coor);
+        this.map.setOwner(attacker.x_coor, attacker.y_coor, "");
+        this.map.setType(attacker.x_coor, attacker.y_coor, "");
+        attacker.x_coor = new_x;
+        attacker.y_coor = new_y;
+        this.map.setOwner(attacker.x_coor, attacker.y_coor, owner);
+        this.map.setType(attacker.x_coor, attacker.y_coor, "unit");
+        return attacker;
     }
 }

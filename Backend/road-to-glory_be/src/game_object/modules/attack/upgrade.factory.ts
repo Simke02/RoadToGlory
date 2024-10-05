@@ -1,5 +1,6 @@
 import { FireUpgrade } from "./decorators/fire.upgrade";
 import { GasUpgrade } from "./decorators/gas.upgrade";
+import { NoneUpgrade } from "./decorators/none.upgrade";
 import { NuclearUpgrade } from "./decorators/nuclear.upgrade";
 import { UpgradeDecorator } from "./decorators/upgrade.decorator";
 import { AttackStrategy } from "./strategies/attack.strategy";
@@ -18,6 +19,9 @@ export class UpgradeFactory{
                 break;
             case "fire":
                 upgrade = new FireUpgrade(strategy);
+                break;
+            case "none":
+                upgrade = new NoneUpgrade(strategy);
                 break;
         }
 
