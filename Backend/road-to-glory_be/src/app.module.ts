@@ -13,6 +13,7 @@ import { AutomapperModule } from '@automapper/nestjs';
 import { classes } from '@automapper/classes';
 import { JwtModule } from '@nestjs/jwt';
 import configuration from './persistence/configuration/configuration';
+import { config } from './common/environment/orm.config';
 
 @Module({
   imports: [
@@ -21,12 +22,12 @@ import configuration from './persistence/configuration/configuration';
       envFilePath: "src/common/environment/.env",
       load: [configuration],
     }),
-    TypeOrmModule.forRoot({
+    TypeOrmModule.forRoot(/*{
     type: 'postgres',
     url: process.env.DATABASE_URL,
     autoLoadEntities:true,
     synchronize:true
-  }),
+  }*/config),
     AutomapperModule.forRoot({
     strategyInitializer: classes(),
   }),

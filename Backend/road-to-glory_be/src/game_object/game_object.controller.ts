@@ -13,7 +13,7 @@ export class GameObjectController {
   ) {}
 
   @Get('whatUpgrades')
-  @UseGuards(JwtGuard)
+  //@UseGuards(JwtGuard)
   whatUpgradesExist(){
     return this.gameObjectService.whatUpgradesExist();
   }
