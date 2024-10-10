@@ -11,6 +11,7 @@ import { BasicFacility } from 'src/common/models/basic_facility.model';
 import { PositionStep } from 'src/common/models/position/position_step.model';
 import { UpgradeService } from './modules/upgrade/upgrade.service';
 import { Upgrade } from 'src/common/models/upgrade/upgrade.model';
+import { Position } from 'src/common/models/position/position.model';
 
 @Injectable()
 export class GameObjectService {
@@ -148,5 +149,9 @@ export class GameObjectService {
 
   getTerrain(): string[][] {
     return this.map.getTerrain();
+  }
+
+  getPosition(x_coor: number, y_coor: number): Position {
+    return this.map.getPosition(x_coor, y_coor);
   }
 }

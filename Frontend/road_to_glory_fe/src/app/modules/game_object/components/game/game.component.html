@@ -3,7 +3,7 @@
       <div
         *ngFor="let cell of row; let colIndex = index"
         class="cell"
-        (click)="onCellClick(rowIndex, colIndex)"
+        (click)="onCellLeftClick(rowIndex, colIndex)"
         [ngStyle]="{ 'background-color': getColor(cell) }"
       >
       </div>
