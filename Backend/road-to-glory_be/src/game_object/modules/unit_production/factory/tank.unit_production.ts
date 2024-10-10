@@ -7,7 +7,7 @@ export class TankUnitProduction implements UnitProductionFactory{
         let unit: Unit;
 
         switch(what_unit) {
-            case "barracks":
+            case "tank":
                 unit = new Tank(x_coor, y_coor);
                 break;
         }

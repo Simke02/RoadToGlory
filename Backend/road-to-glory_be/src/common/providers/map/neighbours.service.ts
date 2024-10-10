@@ -6,7 +6,7 @@ import { Map } from "./map";
 export class NeighboursService {
     //Odradi proveru da li postoje polja pored current i sve koje postoje dodaj
     addToNeighbours(current: PositionStep, map: Map): PositionStep[] {
-        let neighbours: PositionStep[];
+        let neighbours: PositionStep[] = [];
 
         neighbours = this.addIfExists(current.x_coor, current.y_coor - 1, neighbours, current.steps_left, map);
         neighbours = this.addIfExists(current.x_coor - 1, current.y_coor - 1, neighbours, current.steps_left, map);

@@ -4,6 +4,10 @@ import { CreateGameObjectDto } from './dto/create-game_object.dto';
 import { UpdateGameObjectDto } from './dto/update-game_object.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtGuard } from 'src/auth/guards/jwt/jwt.guard';
+import { Unit } from 'src/common/models/unit/unit.model';
+import { AttackDto } from 'src/common/models/dto/attack.dto';
+import { DestroyDto } from 'src/common/models/dto/destroy.dto';
+import { MoveDto } from 'src/common/models/dto/move.dto';
 
 @Controller('game-object')
 export class GameObjectController {
@@ -12,6 +16,73 @@ export class GameObjectController {
     private jwtService: JwtService 
   ) {}
 
+  //Probaj kada postoji nesto iza
+  @Get('whatCanBeBuilt/:x_coor/:y_coor')
+  //@UseGuards(JwtGuard)
+  whatCanBeBuilt(
+    @Param('x_coor') x_coor: string,
+    @Param('y_coor') y_coor: string) {
+      const x = parseInt(x_coor, 10);
+      const y = parseInt(y_coor, 10);
+      return this.gameObjectService.whatCanBeBuilt(x, y);
+  }
+
+  //Probaj kada postoje neki objekti i jedinice
+  @Post('unitTurnPossibilities')
+  //@UseGuards(JwtGuard)
+  unitTurnPossibilities(
+    @Body() unit: Unit) {
+      return this.gameObjectService.unitTurnPossibilities(unit);
+  }
+
+  @Post('attack')
+  //@UseGuards(JwtGuard)
+  attack(
+    @Body() attackDto: AttackDto) {
+      const {attacker, defender} = attackDto;
+      return this.gameObjectService.attack(attacker, defender);
+  }
+
+  @Post('destroy')
+  //@UseGuards(JwtGuard)
+  destroy(
+    @Body() destroyDto: DestroyDto) {
+      const {attacker, object} = destroyDto;
+      return this.gameObjectService.destroy(attacker, object);
+  }
+
+  @Post('move')
+  //@UseGuards(JwtGuard)
+  move(
+    @Body() moveDto: MoveDto) {
+      const {unit, final_position} = moveDto;
+      return this.gameObjectService.move(unit, final_position);
+  }
+
+  @Get('produceUnit/:unit_type/:unit_name/:x_coor/:y_coor')
+  //@UseGuards(JwtGuard)
+  produceUnit(
+    @Param('unit_type') unit_type: string,
+    @Param('unit_name') unit_name: string,
+    @Param('x_coor') x_coor: string,
+    @Param('y_coor') y_coor: string) {
+      const x = parseInt(x_coor, 10);
+      const y = parseInt(y_coor, 10);
+      return this.gameObjectService.produceUnit(unit_type, unit_name, x, y);
+  }
+
+  //NISAM PROBAO
+  @Get('produceFacility/:facility_id/:x_coor/:y_coor')
+  //@UseGuards(JwtGuard)
+  produceFacility(
+    @Param('facility_id') facility_id: string,
+    @Param('x_coor') x_coor: string,
+    @Param('y_coor') y_coor: string) {
+      const x = parseInt(x_coor, 10);
+      const y = parseInt(y_coor, 10);
+      return this.gameObjectService.produceFacility(facility_id, x, y);
+  }
+
   @Get('whatUpgrades')
   //@UseGuards(JwtGuard)
   whatUpgradesExist(){
@@ -19,17 +90,14 @@ export class GameObjectController {
   }
 
   @Get('researchUpgrade/:what_upgrade')
-  @UseGuards(JwtGuard)
+  //@UseGuards(JwtGuard)
   researchUpgrade(@Param('what_upgrade') what_upgrade: string) {
     return this.gameObjectService.researchUpgrade(what_upgrade);
   }
 
-  @Get('produceFacility/:facility_id/:x_coor/:y_coor')
-  @UseGuards(JwtGuard)
-  produceFacility(
-    @Param('facility_id') facility_id: string,
-    @Param('x_coor') x_coor: number,
-    @Param('y_coor') y_coor: number) {
-      return this.gameObjectService.produceFacility(facility_id, x_coor, y_coor);
+  @Get('getTerrain')
+  //@UseGuards(JwtGuard)
+  getTerrain() {
+    return this.gameObjectService.getTerrain();
   }
 }

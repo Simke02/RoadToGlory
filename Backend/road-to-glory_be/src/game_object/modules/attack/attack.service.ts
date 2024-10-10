@@ -33,7 +33,7 @@ export class AttackService {
 
     //Sve jedinice koje jedinica moze da napadne
     whatCanUnitAttack(unit: Unit, player: string/*enemy_units: Unit[]*/): PositionStep[]{//Unit[] {
-        let units_in_range: PositionStep[]//Unit[];
+        let units_in_range: PositionStep[] = [];//Unit[];
 
         let visited: PositionStep[] = [];
         let just_added: PositionStep[] = [];

@@ -1,0 +1,19 @@
+.matrix {
+    display: flex;
+    flex-direction: column; /* Make sure rows stack vertically */
+    height: 100vh;
+    width: 100vw;
+  }
+  
+  .row {
+    display: flex; /* Ensure items in row are displayed horizontally */
+    flex: 1; /* Make each row equal in height */
+  }
+  
+  .cell {
+    flex: 1; /* Make each cell equal in width */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #333;
+  }

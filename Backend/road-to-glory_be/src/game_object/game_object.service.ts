@@ -106,17 +106,20 @@ export class GameObjectService {
   //Pravljenje jedinice
   //y_coor koji se prima je za jedan veci ili manji od facility, zavisi od toga ko je na potezu
   produceUnit(unit_type: string, unit_name: string, x_coor: number, y_coor: number): Unit {
+    /*unit_type: artillery, infantry, tank*/
+    /*unit_name: artillery, infantry, tank*/
     return this.unit_production_service.createUnit(unit_type, unit_name, x_coor, y_coor, this.player);
   }
 
   //Pravljenje objekta
   produceFacility(facility_identificator: string, x_coor: number, y_coor: number): BasicFacility {
+      /*facility_identificator: r_farm, r_mine, p_barracks, p_tank_plant, p_artillery_plant*/
     const result = facility_identificator.split('_');
 
-    if(result[0] === "p") {
+    if(result[0] === 'p') {
       return this.facility_production_service.produceFacility(result[1], x_coor, y_coor, this.player);
     }
-    else if(result[0] === "r") {
+    else if(result[0] === 'r') {
       return this.resource_facility_production_service.produceResourceFacility(result[1], x_coor, y_coor, this.player);
     }
   }
@@ -141,5 +144,9 @@ export class GameObjectService {
   //Vraca izuceni upgrade
   researchUpgrade(what_upgrade: string): Upgrade {
     return this.upgrade_service.researchUpgrade(what_upgrade);
+  }
+
+  getTerrain(): string[][] {
+    return this.map.getTerrain();
   }
 }

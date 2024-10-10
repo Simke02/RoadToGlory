@@ -1,0 +1,11 @@
+<div class="matrix">
+    <div *ngFor="let row of terrain; let rowIndex = index" class="row">
+      <div
+        *ngFor="let cell of row; let colIndex = index"
+        class="cell"
+        (click)="onCellClick(rowIndex, colIndex)"
+        [ngStyle]="{ 'background-color': getColor(cell) }"
+      >
+      </div>
+    </div>
+  </div>

@@ -29,7 +29,7 @@ export class DestroyService {
 
     //Svi objekti koje jedinica moze da napadne
     whatCanUnitDestroy(unit: Unit, player: string/*enemy_objects: BasicFacility[]*/): PositionStep[]/*BasicFacility[]*/ {
-        let objects_in_range: PositionStep[];//BasicFacility[];
+        let objects_in_range: PositionStep[] = [];//BasicFacility[];
 
         let visited: PositionStep[] = [];
         let just_added: PositionStep[] = [];
