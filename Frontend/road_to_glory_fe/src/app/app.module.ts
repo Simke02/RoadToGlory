@@ -6,12 +6,14 @@ import { AppComponent } from './app.component';
 import { GameObjectModule } from './modules/game_object/game_object.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { HttpClientModule } from '@angular/common/http';
+import { CommunicationModule } from './modules/communication/communication.module';
 
 @NgModule({
   declarations: [
     AppComponent
   ],
   imports: [
+    CommunicationModule,
     BrowserModule,
     AppRoutingModule,
     GameObjectModule,
