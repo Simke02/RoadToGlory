@@ -24,14 +24,80 @@ export class GameComponent implements OnInit {
           this.terrain = terrain;
         }
       })
+      //ovde treba da se generise id za game i da kontaktira bazu
       this.communication_service.joinRoom("GameID");
+
+      this.communication_service.getJoin()
+      .subscribe({
+        next:(message)=>{
+          console.log(message);
+        }
+      });
+
+      this.communication_service.getLeave()
+      .subscribe({
+        next:(message)=>{
+          console.log(message);
+        }
+      });
+
+
+      this.communication_service.getAttack()
+      .subscribe({
+        next: (message)=>{
+          console.log(message);
+        }
+      });
+
+      this.communication_service.getDestroy()
+      .subscribe({
+        next:(message)=>{
+          console.log(message);
+        }
+      });
+
+      this.communication_service.getMove()
+      .subscribe({
+        next:(message)=>{
+          console.log(message);
+        }
+      });
+
+      this.communication_service.getProduceUnit()
+      .subscribe({
+        next:(message)=>{
+          console.log(message);
+        }
+      });
+
+      this.communication_service.getProduceFacility()
+      .subscribe({
+        next:(message)=>{
+          console.log(message);
+        }
+      });
+
+      this.communication_service.getNextTurn()
+      .subscribe({
+        next:(message)=>{
+          console.log(message);
+        }
+      });
+
+      this.communication_service.getEndGame()
+      .subscribe({
+        next:(message)=>{
+          console.log(message);
+        }
+      });
+
 
       this.communication_service.getMessage()
       .subscribe({
         next: (message)=>{
           console.log(message);
         }
-      })
+      });
   }
 
   getColor(value: string): string {
@@ -52,7 +118,7 @@ export class GameComponent implements OnInit {
   onCellClick(row: number, col: number): void {
     console.log(`Cell clicked at (${row}, ${col})`);
     
-    this.communication_service.sendMessage("GameID", `Cell clicked at (${row}, ${col})`);
+    this.communication_service.sendMessage(`Cell clicked at (${row}, ${col})`);
     // Add logic here, e.g., toggling the cell’s value
   }
 }
