@@ -38,8 +38,8 @@ export class CommunicationService {
     this.socket.emit('destroy', {'destroyDto': destroy});
   }
 
-  sendMove(move:MoveDto):void{
-    this.socket.emit('move', {"moveDto": move});
+  sendMove(unit: Unit):void{
+    this.socket.emit('move', {"unit": unit});
   }
 
   sendProduceUnit(unit:Unit):void{
@@ -121,10 +121,10 @@ export class CommunicationService {
     });
   }
 
-  getMove(): Observable<MoveDto>{
+  getMove(): Observable<Unit>{
     return new Observable(observer=>{
-      const listener = (move: MoveDto)=>{
-        observer.next(move);
+      const listener = (unit: Unit)=>{
+        observer.next(unit);
       };
 
       this.socket.on('onMove', listener);

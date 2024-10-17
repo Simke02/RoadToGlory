@@ -3,6 +3,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { subscribe } from "diagnostics_channel";
 import { connect } from "http2";
 import { Server, Socket } from 'socket.io'
+import { BasicFacility } from "src/common/models/basic_facility.model";
 import { AttackDto } from "src/common/models/dto/attack.dto";
 import { DestroyDto } from "src/common/models/dto/destroy.dto";
 import { MoveDto } from "src/common/models/dto/move.dto";
@@ -94,10 +95,10 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
     //move
     @SubscribeMessage('move')
     onMoveMessage(
-        @MessageBody('moveDto') move: MoveDto,
+        @MessageBody('unit') unit: Unit,
         @ConnectedSocket() client: Socket
     ){
-        client.broadcast.to(this.room).emit('onMove', move);
+        client.broadcast.to(this.room).emit('onMove', unit);
     }
 
     //produceUnit
@@ -112,7 +113,7 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
     //produceFacility
     @SubscribeMessage('produceFacility')
     onProduceFacilityMessage(
-        @MessageBody('facility') facility: Facility,
+        @MessageBody('facility') facility: BasicFacility,
         @ConnectedSocket() client: Socket
     ){
         client.broadcast.to(this.room).emit('onProduceFacility', facility);

@@ -1,0 +1,40 @@
+<div class="signup-wrapper">
+    <div  class="signup-form">
+      <div class="basic-input">
+        <label>Username</label>
+        <input
+          matInput
+          placeholder="Petar Petrovic"
+          value=""
+          formControlName="username"
+        />
+      </div>
+  
+      <div class="basic-input">
+        <label>First Name</label>
+        <input matInput value="" formControlName="firstName" />
+      </div>
+  
+      <div class="basic-input">
+        <label>Last Name</label>
+        <input matInput value="" formControlName="lastName" />
+      </div>
+  
+      <div class="basic-input">
+        <label>Email</label>
+        <input matInput value="" formControlName="email" />
+      </div>
+  
+      <div class="basic-input">
+        <label>Contact Phone</label>
+        <input matInput value="" formControlName="contactPhone" />
+      </div>
+  
+      <div class="basic-input">
+        <label>Password</label>
+        <input matInput type="password" value="" formControlName="password" />
+      </div>
+  
+      <button mat-button color="primary" (click)="onBtnClick()">Signup</button>
+    </div>
+  </div>

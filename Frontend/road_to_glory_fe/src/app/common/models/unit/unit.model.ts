@@ -1,7 +1,7 @@
 export interface Unit{
-    //id:number;
     //type:string;
 
+    id:number;
     x_coor: number;
     y_coor: number;
     health: number;
@@ -11,4 +11,5 @@ export interface Unit{
     steps_left: number;
     upgrade: string;
     finished_turn: boolean;  //Da li je istrosio potez
+    icon: string;
 }
