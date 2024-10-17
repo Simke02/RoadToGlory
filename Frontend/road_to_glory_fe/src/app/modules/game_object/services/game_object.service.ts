@@ -12,6 +12,7 @@ import { MoveDto } from "src/app/common/models/dto/move.dto";
 import { BasicFacility } from "src/app/common/models/basic_facility.model";
 import { UpgradesDto } from "src/app/common/models/dto/upgrades.dto";
 import { Position } from "src/app/common/models/position/position.model";
+import { Upgrade } from "src/app/common/models/upgrade/upgrade.model";
 
 @Injectable()
 export class GameObjectService {
@@ -50,8 +51,8 @@ export class GameObjectService {
         return this.http.get<UpgradesDto>(environment.baseApiUrl + `/game-object/whatUpgrades`);
     }
 
-    researchUpgrade(what_upgrade: string): Observable<string> {
-        return this.http.get<string>(environment.baseApiUrl + `/game-object/researchUpgrade/${what_upgrade}`);
+    researchUpgrade(what_upgrade: string): Observable<Upgrade> {
+        return this.http.get<Upgrade>(environment.baseApiUrl + `/game-object/researchUpgrade/${what_upgrade}`);
     }
 
     getTerrain(): Observable<string[][]> {

@@ -386,7 +386,7 @@ export class Map{
         positions[12][0] = {x_coor: 12, y_coor: 0, terrain: "plains", owner: "", type: ""}
         positions[12][1] = {x_coor: 12, y_coor: 1, terrain: "plains", owner: "", type: ""}
         positions[12][2] = {x_coor: 12, y_coor: 2, terrain: "plains", owner: "", type: ""}
-        positions[12][3] = {x_coor: 12, y_coor: 3, terrain: "plains", owner: "", type: ""}
+        positions[12][3] = {x_coor: 12, y_coor: 3, terrain: "plains", owner: "andrija", type: "city"}
         positions[12][4] = {x_coor: 12, y_coor: 4, terrain: "plains", owner: "", type: ""}
         positions[12][5] = {x_coor: 12, y_coor: 5, terrain: "plains", owner: "", type: ""}
         positions[12][6] = {x_coor: 12, y_coor: 6, terrain: "forest", owner: "", type: ""}

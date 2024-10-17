@@ -35,7 +35,7 @@ export class GameObjectService {
     this.unit_production_service = new UnitProductionService(map);
     this.upgrade_service = new UpgradeService();
 
-    this.player = ""; //Pretpostavljamo da sadrzi username playera koji trenutno izvrsava potez
+    this.player = "andrija"; //Pretpostavljamo da sadrzi username playera koji trenutno izvrsava potez
   }
 
   //Sta moze da bude izgradjeno na jednom polju
@@ -115,7 +115,7 @@ export class GameObjectService {
   //Pravljenje objekta
   produceFacility(facility_identificator: string, x_coor: number, y_coor: number): BasicFacility {
       /*facility_identificator: r_farm, r_mine, p_barracks, p_tank_plant, p_artillery_plant*/
-    const result = facility_identificator.split('_');
+    const result = facility_identificator.split('-');
 
     if(result[0] === 'p') {
       return this.facility_production_service.produceFacility(result[1], x_coor, y_coor, this.player);
