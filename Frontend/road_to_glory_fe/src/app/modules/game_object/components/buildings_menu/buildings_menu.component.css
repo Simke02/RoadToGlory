@@ -1,0 +1,25 @@
+.building-row {
+    display: flex;
+    width: 100%;
+    gap: 8px;
+  }
+  
+  .building-cell {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: center;
+    cursor: pointer;
+    background-color: #f9f9f9;
+    transition: background-color 0.2s ease;
+  }
+  
+  .building-cell.disabled {
+    background-color: #ddd;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  
+  .building-cell p {
+    margin: 0;
+  }

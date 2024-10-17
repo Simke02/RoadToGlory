@@ -11,9 +11,9 @@ export class FacilityProductionFactory{
 
     constructor(@Inject('MAP') private readonly map: Map){
         this.facility_name = [];
-        this.facility_name.push("p_barracks"); //Ovo p stavljamo da bi smo mogli da razlikujemo u funkciji produceFacility iz game_obj
-        this.facility_name.push("p_tank_plant");
-        this.facility_name.push("p_artillery_plant");
+        this.facility_name.push("p-barracks"); //Ovo p stavljamo da bi smo mogli da razlikujemo u funkciji produceFacility iz game_obj
+        this.facility_name.push("p-tank_plant");
+        this.facility_name.push("p-artillery_plant");
 
         this.gold_cost = [];
         this.gold_cost.push(25);

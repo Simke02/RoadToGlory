@@ -3,9 +3,28 @@
       <div
         *ngFor="let cell of row; let colIndex = index"
         class="cell"
-        (click)="onCellClick(rowIndex, colIndex)"
+        (click)="onCellLeftClick(rowIndex, colIndex)"
         [ngStyle]="{ 'background-color': getColor(cell) }"
       >
       </div>
     </div>
-  </div>
+</div>
+
+<!--Moras da dodas logiku za prenos parametara-->
+<div *ngIf="buildings_menu" class="menu-container">
+  <app-buildings-menu [buildings]="buildings"
+    (closeMenu)="closeBuildingsMenu()" (optionSelected)="handleBuildingsMenu($event)">
+  </app-buildings-menu>
+</div>
+
+<!--Moras da dodas logiku za prenos parametara-->
+<div *ngIf="production_menu" class="menu-container">
+  <app-production-menu [facility]="selected_facility" [available_resources]="available_resources"
+  (closeMenu)="closeProductionMenu()" (optionSelected)="handleProductionMenu($event)">></app-production-menu>
+</div>
+
+<!--Moras da dodas logiku za prenos parametara-->
+<div *ngIf="upgrades_menu" class="menu-container">
+  <app-upgrades-menu [upgrades]="upgrades" [gold]="gold"
+  (closeMenu)="closeUpgradesMenu()" (optionSelected)="handleUpgradesMenu($event)"></app-upgrades-menu>
+</div>

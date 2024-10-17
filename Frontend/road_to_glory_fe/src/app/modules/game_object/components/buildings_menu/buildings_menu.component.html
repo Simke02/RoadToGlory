@@ -1,0 +1,10 @@
+<div class="building-row">
+    <div 
+      *ngFor="let building of buildingsData"
+      class="building-cell"
+      [ngClass]="{'disabled': building.gold_cost > available_gold}"
+      (click)="selectBuilding(building)">
+      <p>{{ building.building_name }}</p>
+      <p>Cost: {{ building.gold_cost }}</p>
+    </div>
+</div>

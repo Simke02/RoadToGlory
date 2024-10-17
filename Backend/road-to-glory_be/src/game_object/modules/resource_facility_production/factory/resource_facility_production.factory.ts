@@ -10,8 +10,8 @@ export class ResourceFacilityProductionFactory{
 
     constructor(@Inject('MAP') private readonly map: Map) {
         this.resource_facility_name = [];
-        this.resource_facility_name.push("r_farm");
-        this.resource_facility_name.push("r_mine");
+        this.resource_facility_name.push("r-farm");
+        this.resource_facility_name.push("r-mine");
 
         this.gold_cost = [];
         this.gold_cost.push(10);

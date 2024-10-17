@@ -100,4 +100,14 @@ export class GameObjectController {
   getTerrain() {
     return this.gameObjectService.getTerrain();
   }
+
+  @Get('getPosition/:x_coor/:y_coor')
+  //@UseGuards(JwtGuard)
+  getPosition(
+    @Param('x_coor') x_coor: string,
+    @Param('y_coor') y_coor: string) {
+      const x = parseInt(x_coor, 10);
+      const y = parseInt(y_coor, 10);
+      return this.gameObjectService.getPosition(x, y);
+  }
 }
