@@ -2,7 +2,7 @@ import { AutoMap } from "@automapper/classes";
 import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import * as bcrypt from "bcrypt";
 
-@Entity("iser",{ schema: "road_to_glory"})
+@Entity("user")
 export class User{
     @PrimaryGeneratedColumn({type:"int", name:"id"})
     id:number;

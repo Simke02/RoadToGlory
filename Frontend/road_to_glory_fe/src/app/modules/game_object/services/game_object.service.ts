@@ -35,8 +35,8 @@ export class GameObjectService {
         return this.http.post<DestroyDto>(environment.baseApiUrl + `/game-object/destroy`, destroyDto);
     }
 
-    move(moveDto: MoveDto): Observable<MoveDto> {
-        return this.http.post<MoveDto>(environment.baseApiUrl + `/game-object/destroy`, moveDto);
+    move(moveDto: MoveDto): Observable<Unit> {
+        return this.http.post<Unit>(environment.baseApiUrl + `/game-object/move`, moveDto);
     }
 
     produceUnit(unit_type: string, unit_name: string, x_coor: number, y_coor: number): Observable<Unit> {

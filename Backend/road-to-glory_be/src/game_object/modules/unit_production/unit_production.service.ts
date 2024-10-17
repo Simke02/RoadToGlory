@@ -7,9 +7,11 @@ import { Map } from 'src/common/providers/map/map';
 export class UnitProductionService {
     
     private chooser: UnitProductionChooser;
+    private id_gen;
     
     constructor(@Inject('MAP') private readonly map: Map) {
         this.chooser = new UnitProductionChooser();
+        this.id_gen = 1;
     }
 
     //Ovo je funkcija koja se poziva kada treba da se kreira neka jedinica
@@ -18,7 +20,7 @@ export class UnitProductionService {
     //I ime jedinice (u slucaju da postoje razlicite jedinice istog tipa)
     createUnit(unit_type: string, unit_name: string, x_coor: number, y_coor: number, player: string): Unit {
         let unit_production = this.chooser.chooseUnitType(unit_type);
-        const unit = unit_production.produceUnit(unit_name, x_coor, y_coor);
+        const unit = unit_production.produceUnit(unit_name, x_coor, y_coor, this.id_gen++);
         this.map.setOwner(x_coor, y_coor, player);
         this.map.setType(x_coor, y_coor, "unit");
         return unit;

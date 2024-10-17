@@ -8,7 +8,7 @@ import { Facility } from 'src/app/common/models/facility/facility.model';
 })
 export class ProductionMenuComponent implements OnInit{
 
-  @Input() facility: Facility = {x_coor: -1, y_coor: -1, health: 0, iron_cost: [], grain_cost: [], unit_name: [], type: ""};
+  @Input() facility: Facility = {x_coor: -1, y_coor: -1, health: 0, icon: "", iron_cost: [], grain_cost: [], unit_name: [], type: ""};
   @Input() available_resources: {iron: number, grain: number} = {iron: 0, grain: 0};
   @Output() closeMenu = new EventEmitter<void>();
   @Output() optionSelected = new EventEmitter<{unit_type: string, unit_name: string, iron_cost: number, grain_cost: number}>()
@@ -23,7 +23,7 @@ export class ProductionMenuComponent implements OnInit{
       iron_cost: this.facility.iron_cost[index],
       grain_cost: this.facility.grain_cost[index]
     }));
-    console.log(this.unitsData);
+    //console.log(this.unitsData);
   }
 
   @HostListener('document:click', ['$event.target'])

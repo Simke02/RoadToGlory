@@ -36,7 +36,10 @@ export class GameComponent implements OnInit {
   upgrades: UpgradesDto = {upgrade_name: [], gold_cost: []};
   private selected_x: number = -1;
   private selected_y: number = -1;
-  selected_facility: Facility = {x_coor: -1, y_coor: -1, health: 0, iron_cost: [], grain_cost: [], unit_name: [], type: ""};
+  selected_facility: Facility = {x_coor: -1, y_coor: -1, health: 0, icon: "", iron_cost: [], grain_cost: [], unit_name: [], type: ""};
+  my_turn: boolean = true;
+  private possible_moves: PositionStep[] = [];
+  private selected_unit: Unit = {id: 0, x_coor: -1, y_coor: -1, health: 0, strenght: 0, range: 0, steps: 0, steps_left: 0, upgrade: "", finished_turn: true, icon: ""};
 
 
   constructor(
@@ -56,14 +59,111 @@ export class GameComponent implements OnInit {
           this.terrain = terrain;
         }
       })
+      //ovde treba da se generise id za game i da kontaktira bazu
       this.communication_service.joinRoom("GameID");
+
+      this.communication_service.getJoin()
+      .subscribe({
+        next:(message)=>{
+          console.log(message);
+        }
+      });
+
+      this.communication_service.getLeave()
+      .subscribe({
+        next:(message)=>{
+          console.log(message);
+        }
+      });
+
+
+      this.communication_service.getAttack()
+      .subscribe({
+        next: (message)=>{
+          console.log(message);
+        }
+      });
+
+      this.communication_service.getDestroy()
+      .subscribe({
+        next:(message)=>{
+          console.log(message);
+        }
+      });
+
+      this.communication_service.getMove()
+      .subscribe({
+        next:(unit)=>{
+          if(this.game_service.isUnit(unit)){
+            const index = this.enemy_units.findIndex(u => u.id === unit.id);
+            const old_unit = this.enemy_units[index];
+            if (index !== -1) {
+              this.enemy_units.splice(index, 1);
+            }
+            this.enemy_units.push(unit);
+
+            //2 Skinemo ikonicu i postavimo novu
+            this.removeIconFromCell(old_unit.x_coor, old_unit.y_coor);
+            this.displayIconAtCell(unit.x_coor, unit.y_coor, unit.icon);
+          }
+        }
+      });
+
+      this.communication_service.getProduceUnit()
+      .subscribe({
+        next:(unit)=>{
+          if(this.game_service.isUnit(unit)){
+            this.enemy_units.push(unit);
+            this.displayIconAtCell(unit.x_coor, unit.y_coor, unit.icon);
+          }
+        }
+      });
+
+      this.communication_service.getProduceFacility()
+      .subscribe({
+        next:(facility)=>{
+          if(this.game_service.isBasicFacility(facility)){
+            this.enemy_facilities.push(facility);
+            this.displayIconAtCell(facility.x_coor, facility.y_coor, facility.icon);
+          }
+        }
+      });
+
+      //Da za prvi potez ne dodaje gold za ovog koji drugi igra
+      this.communication_service.getNextTurn()
+      .subscribe({
+        next:()=>{
+          console.log('%d %d %d', this.gold, this.available_resources.iron, this.available_resources.grain);
+          this.my_turn = true;
+          this.player_units.forEach(unit => {
+            unit.finished_turn = false;
+            unit.steps_left = unit.steps;
+          });
+          this.gold += 2;
+          this.player_resource_facilities.forEach(facility => {
+            if(facility.type === "iron")
+              this.available_resources.iron += 7;
+            else if(facility.type === "grain")
+              this.available_resources.grain += 10;
+          })
+          console.log('%d %d %d', this.gold, this.available_resources.iron, this.available_resources.grain);
+        }
+      });
+
+      this.communication_service.getEndGame()
+      .subscribe({
+        next:(message)=>{
+          console.log(message);
+        }
+      });
+
 
       this.communication_service.getMessage()
       .subscribe({
         next: (message)=>{
           console.log(message);
         }
-      })
+      });
   }
 
   getColor(value: string): string {
@@ -82,9 +182,9 @@ export class GameComponent implements OnInit {
   }
 
   onCellLeftClick(row: number, col: number): void {
-    console.log(`Cell clicked at (${row}, ${col})`);
-    
-    this.communication_service.sendMessage("GameID", `Cell clicked at (${row}, ${col})`);
+    if(this.possible_moves.length != 0){
+      this.removeRedBoarders();
+    }
 
     this.game_object_service.getPosition(row, col)
         .subscribe({
@@ -98,7 +198,6 @@ export class GameComponent implements OnInit {
                 this.game_object_service.whatCanBeBuilt(row, col)
                 .subscribe({
                   next: (buildings) => {
-                    console.log(buildings);
                     //treba da se pozove komponenta koja ce to da sadrzi
                     this.buildings_menu = true;
                     buildings.gold_cost.unshift(this.gold);
@@ -119,10 +218,17 @@ export class GameComponent implements OnInit {
                   .subscribe({
                       next: (position_step) => {
                         console.log(position_step);
-                        //treba da se pozove komponenta koja ce to da sadrzi
+                        this.possible_moves = position_step;
+                        position_step.forEach(pos => {
+                          const cell = this.el.nativeElement.querySelector(`.row:nth-child(${pos.x_coor + 1}) .cell:nth-child(${pos.y_coor + 1})`);
+                          if (cell) {
+                            this.renderer.setStyle(cell, 'border-color', 'red');
+                          }
+                        });
+                        
                       }
                   })
-
+                  this.selected_unit = unit;
                 }
               }
               //Odabir upgradova za izuciti
@@ -139,7 +245,6 @@ export class GameComponent implements OnInit {
                           this.upgrades.gold_cost.push(upgrades.gold_cost[index]);
                         }
                       });
-                      console.log(this.upgrades);
                       //treba da se pozove komponenta koja ce to da sadrzi
                       //Treba da prodjes kroz sve koje ti imas i da ih izbacis iz ponude
                       this.upgrades_menu = true;
@@ -171,14 +276,47 @@ export class GameComponent implements OnInit {
         })
   }
 
+  onCellRightClick(row: number, col: number, event: MouseEvent) {
+    event.preventDefault();
+    const move = this.possible_moves.find(m => m.x_coor === row && m.y_coor === col);
+    if(move){
+      //Mora da se proveri sta je na poziciji i da se na osnovu toga zove attack, destroy ili move
+
+      //attack
+
+      //destroy
+
+      //move
+      this.game_object_service.move({unit: this.selected_unit, final_position: move})
+      .subscribe({
+        next: (unit) => {
+          //1 Na osnovu id izbacis iz player_units taj unit i dodas ga opet
+          const index = this.player_units.findIndex(u => u.id === unit.id);
+          const old_unit = this.player_units[index];
+          if (index !== -1) {
+            this.player_units.splice(index, 1);
+          }
+          this.player_units.push(unit);
+          //2 Skinemo ikonicu i postavimo novu
+          this.removeIconFromCell(old_unit.x_coor, old_unit.y_coor);
+          this.displayIconAtCell(unit.x_coor, unit.y_coor, unit.icon);
+          
+          //3
+          this.removeRedBoarders();
+
+          //4 posaljemo drugom igracu promenu
+          this.communication_service.sendMove(unit);
+        }
+      })
+    }
+  }
+
   //Odavde pozivas proizvodnju objekta i cuvas ga na odgovarajucem mestu
   handleBuildingsMenu(selected_option: {building_name: string, gold_cost: number}) {
     this.buildings_menu = false;
-    console.log(selected_option);
     this.game_object_service.produceFacility(selected_option.building_name, this.selected_x, this.selected_y)
     .subscribe({
       next: (facility) => {
-        console.log(facility);
         if(this.game_service.isProductionFacility(facility))
           this.player_production_facilities.push(facility);
         else if(this.game_service.isResourceFacility(facility))
@@ -188,11 +326,9 @@ export class GameComponent implements OnInit {
         this.selected_y = -1;
         this.gold -= selected_option.gold_cost;
         this.buildings = {building_names: [], gold_cost: []};
-        //Moras da posaljes protivniku taj facility
+        this.communication_service.sendProduceFacility(facility);
       }
     })
-
-    console.log(selected_option);
   }
 
   //Odavde gasis meni za izgradnju objekata bez da bilo sta izaberes
@@ -214,9 +350,10 @@ export class GameComponent implements OnInit {
         this.selected_y = -1;
         this.available_resources.grain -= selected_option.grain_cost;
         this.available_resources.iron -= selected_option.iron_cost;
-        this.selected_facility = {x_coor: -1, y_coor: -1, health: 0, iron_cost: [], grain_cost: [], unit_name: [], type: ""};
+        this.selected_facility = {x_coor: -1, y_coor: -1, health: 0, icon: "", iron_cost: [], grain_cost: [], unit_name: [], type: ""};
         this.production_menu = false;
-        //Moras da posaljes protivniku taj unit
+        this.communication_service.sendProduceUnit(unit);
+        console.log(unit);
       }
     })
   }
@@ -226,7 +363,7 @@ export class GameComponent implements OnInit {
     this.production_menu = false;
     this.selected_x = -1;
     this.selected_y = -1;
-    this.selected_facility = {x_coor: -1, y_coor: -1, health: 0, iron_cost: [], grain_cost: [], unit_name: [], type: ""};
+    this.selected_facility = {x_coor: -1, y_coor: -1, health: 0, icon: "", iron_cost: [], grain_cost: [], unit_name: [], type: ""};
   }
 
   //Odavde pozivas izucavanje upgrade i cuvas ga na odgovarajucem mestu
@@ -260,5 +397,37 @@ export class GameComponent implements OnInit {
       this.renderer.addClass(iconElement, 'icon');
       this.renderer.appendChild(cell, iconElement);
     }
+  }
+
+  removeIconFromCell(row: number, col: number) {
+    const cell = this.el.nativeElement.querySelector(`.row:nth-child(${row + 1}) .cell:nth-child(${col + 1})`);
+    
+    if (cell) {
+      // Find the icon element (you can use a specific class if you've added one)
+      const icon = cell.querySelector('.icon'); // or a specific class, e.g., '.my-icon-class'
+      
+      if (icon) {
+        this.renderer.removeChild(cell, icon); // Remove the icon from the cell
+      }
+    }
+  }
+
+  onNextTurnClick() {
+    this.my_turn = false; 
+    this.communication_service.sendNextTurn();
+  }
+  
+  removeRedBoarders() {
+    //3 Sklonimo crvene bordere
+    this.possible_moves.forEach(move => {
+      const cell = this.el.nativeElement.querySelector(`.row:nth-child(${move.x_coor + 1}) .cell:nth-child(${move.y_coor + 1})`);
+      if (cell) {
+        this.renderer.setStyle(cell, 'border-color', ''); // Reset to default color
+      }
+    })
+
+    //4 sklonimo selected_unit i possible_moves
+    this.possible_moves = [];
+    this.selected_unit = {id: 0, x_coor: -1, y_coor: -1, health: 0, strenght: 0, range: 0, steps: 0, steps_left: 0, upgrade: "", finished_turn: true, icon: ""};
   }
 }

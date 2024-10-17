@@ -4,6 +4,7 @@
         *ngFor="let cell of row; let colIndex = index"
         class="cell"
         (click)="onCellLeftClick(rowIndex, colIndex)"
+        (contextmenu)="onCellRightClick(rowIndex, colIndex, $event)"
         [ngStyle]="{ 'background-color': getColor(cell) }"
       >
       </div>
@@ -28,3 +29,7 @@
   <app-upgrades-menu [upgrades]="upgrades" [gold]="gold"
   (closeMenu)="closeUpgradesMenu()" (optionSelected)="handleUpgradesMenu($event)"></app-upgrades-menu>
 </div>
+
+<button class="bottom-right-button" (click)="onNextTurnClick()">Next turn</button>
+
+<div *ngIf="!my_turn" class="screen-overlay"></div>
