@@ -20,4 +20,12 @@ export class GameService {
     isProductionFacility(obj: BasicFacility): obj is Facility {
         return 'unit_name' in obj;
     }
+
+    isBasicFacility(obj: any): obj is BasicFacility {
+        return 'x_coor' in obj;
+    }
+
+    isUnit(obj: any): obj is Unit {
+        return 'x_coor' in obj;
+    }
 }
