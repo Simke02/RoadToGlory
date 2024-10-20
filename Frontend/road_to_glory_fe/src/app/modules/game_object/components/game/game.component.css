@@ -1,8 +1,9 @@
 .matrix {
     display: flex;
     flex-direction: column; 
-    height: 100vh;
-    width: 100vw;
+    height: calc(100vh - 115px);/*100vh;*/
+    width: calc(100vw - 15px);/*100vw;*/
+    margin-bottom: 10px; /* Adds space at the bottom */
   }
 
   .row {
@@ -52,3 +53,21 @@
     z-index: 1000; /* Ensure it's on top of other elements */
     pointer-events: all; /* Captures all pointer events */
   }
+
+  .header {
+    display: flex;
+    justify-content: space-between; /* Distribute space evenly between items */
+    padding: 2px;
+    background-color: #f0f0f0; /* Optional background color */
+    border-bottom: 1px solid #ccc; /* Optional border to separate the header */
+}
+
+.resource {
+    flex: 1; /* Make all resource divs the same width */
+    text-align: center; /* Center the text */
+    font-weight: bold;
+}
+
+.resource p {
+    margin: 0; /* Remove default margin from paragraphs */
+}

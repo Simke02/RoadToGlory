@@ -5,7 +5,9 @@
       [ngClass]="{'disabled': unit.iron_cost > available_resources.iron || unit.grain_cost > available_resources.grain}"
       (click)="selectBuilding(unit)">
       <p>{{ unit.unit_name }}</p>
-      <p>Iron Cost: {{ unit.iron_cost }}</p>
-      <p>Grain Cost: {{ unit.grain_cost }}</p>
+      <div class="costs">
+        <p>Iron Cost: {{ unit.iron_cost }}</p>
+        <p>Grain Cost: {{ unit.grain_cost }}</p>
+      </div>
     </div>
   </div>

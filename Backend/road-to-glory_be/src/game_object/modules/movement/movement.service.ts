@@ -78,6 +78,7 @@ export class MovementService {
                 }
             }
         }
+        positions.shift();
 
         return positions;
     }

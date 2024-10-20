@@ -25,12 +25,13 @@ export class GameComponent implements OnInit {
   private player_resource_facilities: ResourceFacility[] = [];
   private player_production_facilities: Facility[] = [];
   private enemy_facilities: BasicFacility[] = [];
-  private player_upgrades: Upgrade[] = []; //Koje upgradove ima korisnik i koliko kosta da se postave na jedinicu
+  player_upgrades: Upgrade[] = []; //Koje upgradove ima korisnik i koliko kosta da se postave na jedinicu
   gold: number = 500;//50;
   available_resources: {grain: number, iron: number} = {grain: 1000, iron: 1000};
   buildings_menu: boolean = false;
   production_menu: boolean = false;
   upgrades_menu: boolean = false;
+  add_upgrades_menu: boolean = false;
   buildings: BuildingsDto = {building_names: [], gold_cost: []};
   //production: ProductionDto = {iron_cost: [], grain_cost: [], unit_name: []};
   upgrades: UpgradesDto = {upgrade_name: [], gold_cost: []};
@@ -40,6 +41,7 @@ export class GameComponent implements OnInit {
   my_turn: boolean = true;
   private possible_moves: PositionStep[] = [];
   private selected_unit: Unit = {id: 0, x_coor: -1, y_coor: -1, health: 0, strenght: 0, range: 0, steps: 0, steps_left: 0, upgrade: "", finished_turn: true, icon: ""};
+  private selected_cell: {x_coor: number, y_coor: number} = {x_coor: -1, y_coor: -1};
 
 
   constructor(
@@ -182,8 +184,18 @@ export class GameComponent implements OnInit {
   }
 
   onCellLeftClick(row: number, col: number): void {
+    if(this.selected_cell.x_coor != -1){
+      this.removeYellowBorder();
+    }
+
+    this.selected_cell = {x_coor: row, y_coor: col};
+    const cell = this.el.nativeElement.querySelector(`.row:nth-child(${row + 1}) .cell:nth-child(${col + 1})`);
+    if (cell) {
+      this.renderer.setStyle(cell, 'border-color', 'yellow');
+    }
+
     if(this.possible_moves.length != 0){
-      this.removeRedBoarders();
+      this.removeRedBorders();
     }
 
     this.game_object_service.getPosition(row, col)
@@ -213,7 +225,7 @@ export class GameComponent implements OnInit {
               else if(position.owner === "andrija" && position.type === "unit"){
                 let unit = this.player_units.find(u => u.x_coor === row && u.y_coor === col);
           
-                if(unit){
+                if(unit && !unit.finished_turn){
                   this.game_object_service.unitTurnPossibilities(unit)
                   .subscribe({
                       next: (position_step) => {
@@ -228,6 +240,10 @@ export class GameComponent implements OnInit {
                         
                       }
                   })
+
+                  if(unit.upgrade === "none")
+                    this.add_upgrades_menu = true;
+
                   this.selected_unit = unit;
                 }
               }
@@ -279,6 +295,10 @@ export class GameComponent implements OnInit {
   onCellRightClick(row: number, col: number, event: MouseEvent) {
     event.preventDefault();
     const move = this.possible_moves.find(m => m.x_coor === row && m.y_coor === col);
+
+    if(this.add_upgrades_menu)
+      this.add_upgrades_menu = false;
+
     if(move){
       //Mora da se proveri sta je na poziciji i da se na osnovu toga zove attack, destroy ili move
 
@@ -302,7 +322,8 @@ export class GameComponent implements OnInit {
           this.displayIconAtCell(unit.x_coor, unit.y_coor, unit.icon);
           
           //3
-          this.removeRedBoarders();
+          this.removeRedBorders();
+          this.removeYellowBorder();
 
           //4 posaljemo drugom igracu promenu
           this.communication_service.sendMove(unit);
@@ -327,6 +348,7 @@ export class GameComponent implements OnInit {
         this.gold -= selected_option.gold_cost;
         this.buildings = {building_names: [], gold_cost: []};
         this.communication_service.sendProduceFacility(facility);
+        this.removeYellowBorder();
       }
     })
   }
@@ -337,6 +359,7 @@ export class GameComponent implements OnInit {
     this.selected_x = -1;
     this.selected_y = -1;
     this.buildings = {building_names: [], gold_cost: []};
+    this.removeYellowBorder();
   }
 
   //Odavde pozivas proizvodnju jedinica i cuvas je na odgovarajucem mestu
@@ -353,6 +376,7 @@ export class GameComponent implements OnInit {
         this.selected_facility = {x_coor: -1, y_coor: -1, health: 0, icon: "", iron_cost: [], grain_cost: [], unit_name: [], type: ""};
         this.production_menu = false;
         this.communication_service.sendProduceUnit(unit);
+        this.removeYellowBorder();
         console.log(unit);
       }
     })
@@ -364,6 +388,7 @@ export class GameComponent implements OnInit {
     this.selected_x = -1;
     this.selected_y = -1;
     this.selected_facility = {x_coor: -1, y_coor: -1, health: 0, icon: "", iron_cost: [], grain_cost: [], unit_name: [], type: ""};
+    this.removeYellowBorder();
   }
 
   //Odavde pozivas izucavanje upgrade i cuvas ga na odgovarajucem mestu
@@ -377,6 +402,7 @@ export class GameComponent implements OnInit {
         this.gold -= option_selected.gold_cost;
         this.upgrades = {upgrade_name: [], gold_cost: []};
         this.upgrades_menu = false;
+        this.removeYellowBorder();
       }
     })
   }
@@ -387,6 +413,28 @@ export class GameComponent implements OnInit {
     this.selected_x = -1;
     this.selected_y = -1;
     this.upgrades = {upgrade_name: [], gold_cost: []};
+    this.removeYellowBorder();
+  }
+
+  //Odavde dodajes upgrade jedinici
+  handleAddUpgradesMenu(option_selected :Upgrade) {
+    this.selected_unit.upgrade = option_selected.name;
+    this.selected_unit.finished_turn = true;
+    this.gold -= option_selected.cost;
+    this.selected_x = -1;
+    this.selected_y = -1;
+    this.add_upgrades_menu = false;
+    this.removeYellowBorder();
+    this.removeRedBorders();
+
+  }
+  
+  //Odavde gasis meni za upgrades bez da bilo sta izaberes
+  closeAddUpgradesMenu() {
+    this.add_upgrades_menu = false;
+    this.selected_x = -1;
+    this.selected_y = -1;
+    this.removeYellowBorder();
   }
 
   displayIconAtCell(row: number, col: number, iconType: string) {
@@ -413,11 +461,13 @@ export class GameComponent implements OnInit {
   }
 
   onNextTurnClick() {
-    this.my_turn = false; 
+    this.my_turn = false;
+    this.removeRedBorders();
+    this.removeYellowBorder();
     this.communication_service.sendNextTurn();
   }
   
-  removeRedBoarders() {
+  removeRedBorders() {
     //3 Sklonimo crvene bordere
     this.possible_moves.forEach(move => {
       const cell = this.el.nativeElement.querySelector(`.row:nth-child(${move.x_coor + 1}) .cell:nth-child(${move.y_coor + 1})`);
@@ -429,5 +479,16 @@ export class GameComponent implements OnInit {
     //4 sklonimo selected_unit i possible_moves
     this.possible_moves = [];
     this.selected_unit = {id: 0, x_coor: -1, y_coor: -1, health: 0, strenght: 0, range: 0, steps: 0, steps_left: 0, upgrade: "", finished_turn: true, icon: ""};
+  }
+
+  removeYellowBorder() {
+    //3 Sklonimo zuti border
+    const cell = this.el.nativeElement.querySelector(`.row:nth-child(${this.selected_cell.x_coor + 1}) .cell:nth-child(${this.selected_cell.y_coor + 1})`);
+    if (cell) {
+      this.renderer.setStyle(cell, 'border-color', ''); // Reset to default color
+    }
+
+    //4 sklonimo selected_cell
+    this.selected_cell = {x_coor: -1, y_coor: -1};
   }
 }

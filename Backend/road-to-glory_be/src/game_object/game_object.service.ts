@@ -53,8 +53,8 @@ export class GameObjectService {
     }
     
     let facilities = {facility_name: [], gold_cost: []}
-    //Moras da uradis proveru da li postoji to y
-    if(this.map.getType(x_coor, y_coor + 1) === "" || this.map.getType(x_coor, y_coor + 1) === "unit"){
+    //OVE PROVERE SAM URADIO SAMO ZA IGRACA KOJI JE LEVO, MORAS I ZA DRUGOG DA ODRADIS
+    if((y_coor + 1) < this.map.getNumberOfColumns() && (this.map.getType(x_coor, y_coor + 1) === "" || this.map.getType(x_coor, y_coor + 1) === "unit")){
       facilities = this.facility_production_service.facilitiesDescription();
     }
     const resource_facilities = this.resource_facility_production_service.resourceFacilitiesDescription();

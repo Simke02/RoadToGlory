@@ -1,0 +1,27 @@
+<div class="signin-wrapper">
+    <form [formGroup]="signin_form" (ngSubmit)="onSubmitSignin()">
+      <div class="signin-form">
+        <h1 class="welcome-sign">Welcome to Road to Glory!</h1>
+        
+        <div class="basic-input">
+          <label>Username</label>
+          <input
+            matInput
+            placeholder="Simke02"
+            value=""
+            formControlName="username"
+          />
+        </div>
+    
+        <div class="basic-input">
+          <label>Password</label>
+          <input matInput type="password" value="" formControlName="password" />
+        </div>
+    
+        <button mat-button color="primary" [disabled]="!this.signin_form.valid">Sign in</button>
+        
+        <p class="signup-link" (click)="navigateToSignup()">Don't have an account? Sign up here.</p>
+      </div>
+    </form>
+</div>
+  

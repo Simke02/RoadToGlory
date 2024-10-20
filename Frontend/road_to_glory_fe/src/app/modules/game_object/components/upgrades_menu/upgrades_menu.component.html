@@ -3,7 +3,7 @@
       *ngFor="let upgrade of upgradesData"
       class="upgrade-cell"
       [ngClass]="{'disabled': upgrade.gold_cost > gold }"
-      (click)="selectBuilding(upgrade)">
+      (click)="selectUpgrade(upgrade)">
       <p>{{ upgrade.upgrade_name }}</p>
       <p>Cost: {{ upgrade.gold_cost }}</p>
     </div>

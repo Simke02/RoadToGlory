@@ -30,7 +30,7 @@ export class UpgradesMenuComponent implements OnInit{
     }
   }
 
-  selectBuilding(upgrade: {upgrade_name: string, gold_cost: number}) {
+  selectUpgrade(upgrade: {upgrade_name: string, gold_cost: number}) {
     this.optionSelected.emit(upgrade);
 }
 }

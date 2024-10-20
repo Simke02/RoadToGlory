@@ -1,10 +1,11 @@
 <div class="signup-wrapper">
+  <form [formGroup]="signup_form" (ngSubmit)="onSubmitSignup()">
     <div  class="signup-form">
       <div class="basic-input">
         <label>Username</label>
         <input
           matInput
-          placeholder="Petar Petrovic"
+          placeholder="Simke02"
           value=""
           formControlName="username"
         />
@@ -12,22 +13,12 @@
   
       <div class="basic-input">
         <label>First Name</label>
-        <input matInput value="" formControlName="firstName" />
+        <input matInput value="" formControlName="first_name" />
       </div>
   
       <div class="basic-input">
         <label>Last Name</label>
-        <input matInput value="" formControlName="lastName" />
-      </div>
-  
-      <div class="basic-input">
-        <label>Email</label>
-        <input matInput value="" formControlName="email" />
-      </div>
-  
-      <div class="basic-input">
-        <label>Contact Phone</label>
-        <input matInput value="" formControlName="contactPhone" />
+        <input matInput value="" formControlName="last_name" />
       </div>
   
       <div class="basic-input">
@@ -35,6 +26,7 @@
         <input matInput type="password" value="" formControlName="password" />
       </div>
   
-      <button mat-button color="primary" (click)="onBtnClick()">Signup</button>
+      <button mat-button color="primary" [disabled]="!this.signup_form.valid">Sign up</button>
     </div>
-  </div>
+  </form>
+</div>

@@ -1,10 +1,10 @@
-.production-row {
+.add-upgrade-row {
     display: flex;
     width: 100%;
     gap: 8px;
   }
   
-  .production-cell {
+  .add-upgrade-cell {
     flex: 1;
     padding: 10px;
     border: 1px solid #ccc;
@@ -14,24 +14,12 @@
     transition: background-color 0.2s ease;
   }
   
-  .production-cell.disabled {
+  .add-upgrade-cell.disabled {
     background-color: #ddd;
     cursor: not-allowed;
     pointer-events: none; /* Disable clicks */
   }
   
-  .production-cell p {
+  .add-upgrade-cell p {
     margin: 0;
-  }
-
-  .costs {
-    display: flex;
-    justify-content: center;
-    gap: 10px; /* Adjust space between Iron and Grain costs */
-    margin-top: 4px; /* Optional: Adjust spacing from unit name */
-  }
-  
-  .costs p {
-    margin: 0;
-    text-align: center;
   }

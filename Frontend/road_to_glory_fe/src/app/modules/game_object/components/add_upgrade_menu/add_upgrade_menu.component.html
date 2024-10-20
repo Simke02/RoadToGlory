@@ -1,0 +1,10 @@
+<div class="add-upgrade-row">
+    <div 
+      *ngFor="let upgrade of upgrades"
+      class="add-upgrade-cell"
+      [ngClass]="{'disabled': upgrade.cost > gold }"
+      (click)="selectUpgrade(upgrade)">
+      <p>{{ upgrade.name }}</p>
+      <p>Cost: {{ upgrade.cost }}</p>
+    </div>
+  </div>
