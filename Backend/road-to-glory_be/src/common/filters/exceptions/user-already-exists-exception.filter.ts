@@ -6,11 +6,11 @@ import { Response } from 'express';
 export class UserAlreadyExistsExceptionFilter implements ExceptionFilter {
     catch(exception: UserAlreadyExistsException, host: ArgumentsHost): any {
         const ctx = host.switchToHttp();
-        const response = ctx.getRequest<Response>();
+        const response = ctx.getResponse<Response>();  // Corrected this line to get the response object
 
         response.status(HttpStatus.BAD_REQUEST).send({
-            statusCode: exception.getStatus(),
+            statusCode: HttpStatus.BAD_REQUEST,  // Use the appropriate status code
             message: exception.message,
-          });
+        });
     }
 }

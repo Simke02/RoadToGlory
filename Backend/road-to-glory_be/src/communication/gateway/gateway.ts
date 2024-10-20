@@ -36,13 +36,13 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
     server:Server
     room?: string;
 
-    @SubscribeMessage('newMessage')
+    @SubscribeMessage('createGame')
     onNewMessage(
         @MessageBody('message') message: string, 
         @ConnectedSocket() client: Socket)
         {
         console.log(message);
-        client.broadcast.to(this.room).emit('onMessage', {
+        client.broadcast.to(this.room).emit('oncreateGame', {
             msg: message,
         });
     }
@@ -58,7 +58,8 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
             client.join(room);
             this.room = room;
             console.log(`${client.id} joined room ${room}`);
-            this.server.to(room).emit('onJoin', `You have joined room: ${room}`);
+            if(clients.size == 2)
+                this.server.to(room).emit('onJoin', ` ${room} is ready!`);
         } else {
             console.log(`Room ${room} is full`);
             this.server.emit('roomFull', 'The room is full.');

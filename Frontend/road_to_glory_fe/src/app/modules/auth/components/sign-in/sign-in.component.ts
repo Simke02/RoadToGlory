@@ -28,9 +28,19 @@ export class SignInComponent {
     
     //Pozovi metodu za slanje na server
     //Prebaci na lobby
+    this.auth_service.auth({
+      username,
+      password
+    }).subscribe({
+      next:res=>{
+        console.log(res);
+        localStorage.setItem("username", res.username);
+      }
+    })
+    this.router.navigate(['/lobby'])
   }
 
   navigateToSignup() {
-    this.router.navigate(['/signup']);
+    this.router.navigate(['/singup']);
   }
 }

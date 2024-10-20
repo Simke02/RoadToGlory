@@ -19,6 +19,7 @@ import { Upgrade } from 'src/app/common/models/upgrade/upgrade.model';
   styleUrls: ['./game.component.css']
 })
 export class GameComponent implements OnInit {
+  private player: string;
   terrain: string[][] = [];
   private player_units: Unit[] = [];
   private enemy_units: Unit[] = [];
@@ -51,7 +52,8 @@ export class GameComponent implements OnInit {
     private renderer: Renderer2,
     private el: ElementRef
   ) {
-    
+    const storedUsername = localStorage.getItem('username');
+    this.player = storedUsername ? JSON.parse(storedUsername) : null;
   }
 
   ngOnInit(): void {
@@ -61,15 +63,7 @@ export class GameComponent implements OnInit {
           this.terrain = terrain;
         }
       })
-      //ovde treba da se generise id za game i da kontaktira bazu
-      this.communication_service.joinRoom("GameID");
-
-      this.communication_service.getJoin()
-      .subscribe({
-        next:(message)=>{
-          console.log(message);
-        }
-      });
+      
 
       this.communication_service.getLeave()
       .subscribe({
