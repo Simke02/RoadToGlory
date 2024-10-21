@@ -1,7 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, UseFilters, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { UserService } from 'src/common/providers/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { InjectMapper } from '@automapper/nestjs';
@@ -12,10 +10,10 @@ import { Response, Request } from 'express';
 import { UserAlreadyExistsExceptionFilter } from 'src/common/filters/exceptions/user-already-exists-exception.filter';
 import { UserNotFoundExceptionFilter } from 'src/common/filters/exceptions/user-not-found-exception.filter';
 import { PasswordNotValidExceptionFilter } from 'src/common/filters/exceptions/password-not-valid-exception.filter';
-import { AuthDto } from './dto/auth.dto';
 import { AUTHORIZATION_HEADER } from 'src/common/headers/headers';
 import { JwtGuard } from './guards/jwt/jwt.guard';
 import { MeUserInfoDto } from 'src/common/models/user/dto/me-user-info.dto';
+import { AuthDto } from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -25,7 +23,7 @@ export class AuthController {
     private jwtService: JwtService,
     @InjectMapper() private readonly classMapper: Mapper,
   ) {}
-
+  
   @Post("")
   @UseFilters(new UserAlreadyExistsExceptionFilter())
   async registerUser(
@@ -33,7 +31,8 @@ export class AuthController {
     @Res() res: Response,
   ){
     const user = this.classMapper.map(userCreateDto, UserCreateDto, User);
-
+    
+    console.log(user);
     await this.userService.save(user);
     res.sendStatus(HttpStatus.OK);
   }
@@ -58,4 +57,5 @@ export class AuthController {
     );
     res.send(this.classMapper.map(user, User, MeUserInfoDto));
   }
+ 
 }

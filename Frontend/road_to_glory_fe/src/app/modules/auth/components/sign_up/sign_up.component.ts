@@ -33,6 +33,17 @@ export class SignUpComponent{
     
     //Pozovi metodu za slanje na server
     //Prebaci na sign-in
+    console.log('ovde ce da pozove servis');
+    this.auth_service.signup({
+      username,
+      password,
+      firstName:first_name,
+      lastName:last_name
+    }).subscribe();
+
+    this.router.navigate(['/signin']);
+
   }
+
 
 }
