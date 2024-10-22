@@ -34,7 +34,7 @@ export class AuthController {
     
     console.log(user);
     await this.userService.save(user);
-    res.sendStatus(HttpStatus.OK);
+    return res.status(HttpStatus.OK).json({ message: "User registered successfully" });
   }
 
   @Post("auth")

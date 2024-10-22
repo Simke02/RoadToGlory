@@ -12,6 +12,8 @@ import { Facility } from 'src/app/common/models/facility/facility.model';
 import { UpgradesDto } from 'src/app/common/models/dto/upgrades.dto';
 import { ProductionDto } from 'src/app/common/models/dto/production.dto';
 import { Upgrade } from 'src/app/common/models/upgrade/upgrade.model';
+import { CurrentUserService } from 'src/app/modules/auth/services/current_user.service';
+import { map } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/modules/auth/services/auth.service';
 import { City } from 'src/app/common/models/city/city.model';
@@ -22,7 +24,8 @@ import { City } from 'src/app/common/models/city/city.model';
   styleUrls: ['./game.component.css']
 })
 export class GameComponent implements OnInit {
-  private player: string = "";
+  private player: string="";
+  private room:string="0";
   private left: boolean = true;
   terrain: string[][] = [];
   private player_units: Unit[] = [];
@@ -50,6 +53,10 @@ export class GameComponent implements OnInit {
   private selected_unit: Unit = {id: 0, x_coor: -1, y_coor: -1, health: 0, strenght: 0, range: 0, steps: 0, steps_left: 0, upgrade: "", finished_turn: true, icon: ""};
   private selected_cell: {x_coor: number, y_coor: number} = {x_coor: -1, y_coor: -1};
 
+  authenticated$ = this.current_user_service
+    .getCurrentUser$()
+    .pipe(map((user) => !!user));
+
 
   constructor(
     private game_object_service: GameObjectService,
@@ -57,6 +64,20 @@ export class GameComponent implements OnInit {
     private game_service: GameService,
     private renderer: Renderer2,
     private el: ElementRef,
+    private current_user_service:CurrentUserService
+  ) {
+    const potential_room = sessionStorage.getItem("room_id");
+    if(potential_room){
+      this.room = JSON.parse(potential_room).toString();
+    }
+
+  }
+      
+      this.communication_service.getLeave()
+      .subscribe({
+        next:(message)=>{
+          console.log(message);
+          
     private router: Router
   ) {}
 
@@ -251,13 +272,6 @@ export class GameComponent implements OnInit {
       }
     });
 
-
-    this.communication_service.getMessage()
-    .subscribe({
-      next: (message)=>{
-        console.log(message);
-      }
-    });
   }
 
   getColor(value: string): string {
@@ -509,11 +523,10 @@ export class GameComponent implements OnInit {
             this.removeRedBorders();
             this.removeYellowBorder();
 
-            //4 posaljemo drugom igracu promenu
-            this.communication_service.sendMove(unit);
-          }
-        })
-      }
+          //4 posaljemo drugom igracu promenu
+          this.communication_service.sendMove(this.room.toString(), unit);
+        }
+      })
     }
   }
 
@@ -532,7 +545,7 @@ export class GameComponent implements OnInit {
         this.selected_y = -1;
         this.gold -= selected_option.gold_cost;
         this.buildings = {building_names: [], gold_cost: []};
-        this.communication_service.sendProduceFacility(facility);
+        this.communication_service.sendProduceFacility(this.room , facility);
         this.removeYellowBorder();
         console.log(this.player_resource_facilities);
       }
@@ -566,7 +579,7 @@ export class GameComponent implements OnInit {
         this.available_resources.iron -= selected_option.iron_cost;
         this.selected_facility = {x_coor: -1, y_coor: -1, health: 0, icon: "", iron_cost: [], grain_cost: [], unit_name: [], type: ""};
         this.production_menu = false;
-        this.communication_service.sendProduceUnit(unit);
+        this.communication_service.sendProduceUnit(this.room, unit);
         this.removeYellowBorder();
         console.log(unit);
       }
@@ -661,7 +674,7 @@ export class GameComponent implements OnInit {
     this.my_turn = false;
     this.removeRedBorders();
     this.removeYellowBorder();
-    this.communication_service.sendNextTurn();
+    this.communication_service.sendNextTurn(this.room);
   }
   
   removeRedBorders() {

@@ -2,6 +2,7 @@ import { OnModuleInit } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { subscribe } from "diagnostics_channel";
 import { connect } from "http2";
+import { from } from "rxjs";
 import { Server, Socket } from 'socket.io'
 import { BasicFacility } from "src/common/models/basic_facility.model";
 import { AttackDto } from "src/common/models/dto/attack.dto";
@@ -34,7 +35,8 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
 
     @WebSocketServer()
     server:Server
-    room?: string;
+    room: string="";
+    id_gen:number =1;
 
     @SubscribeMessage('createGame')
     onNewMessage(
@@ -49,101 +51,120 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
 
     @SubscribeMessage('joinRoom')
     async onJoinRoom(
-        @MessageBody('room') room: string,
+        //@MessageBody('room') room: string,
         @ConnectedSocket() client: Socket    
     ){
-        const clients = this.server.sockets.adapter.rooms.get(room) || new Set();
-
+        if(this.room==="")
+            this.room= this.id_gen.toString();
+      
+        const clients = this.server.sockets.adapter.rooms.get(this.room) || new Set();
+        
         if (clients.size < 2) {
-            client.join(room);
-            this.room = room;
-            console.log(`${client.id} joined room ${room}`);
-            if(clients.size == 2)
-                this.server.to(room).emit('onJoin', ` ${room} is ready!`);
+            client.join(this.room);
+
+            console.log(`${client.id} joined room ${this.room}`);
+            if(clients.size == 2){
+                this.server.to(this.room).emit('onJoin', this.room);
+                console.log(this.room);
+                this.id_gen++;
+                this.room="";
+            }
+                
         } else {
-            console.log(`Room ${room} is full`);
-            this.server.emit('roomFull', 'The room is full.');
+            console.log(`Room ${this.room} is full`);
+            this.server.emit('onRoomFull', 'The room is full.');
         }
         
     }
     @SubscribeMessage('leaveRoom')
     onLeaveMessage(
+        @MessageBody('room') room :string,
         @ConnectedSocket() client: Socket    
     ){
-        client.leave(this.room);
-        this.server.to(this.room).emit('onLeave', `User ${client.id} left room`);
+        client.leave(room);
+        this.server.to(room).emit('onLeave', `User ${client.id} left room`);
         this.room = null;
     }
 
     //attack
     @SubscribeMessage('attack')
     onAttackMessage(
+        @MessageBody('room') room :string,
         @MessageBody('attackDto') attack: AttackDto,
         @ConnectedSocket() client: Socket 
     ){
-        client.broadcast.to(this.room).emit('onAttack', attack);
+        client.broadcast.to(room).emit('onAttack', attack);
     }
 
     //destroy
     @SubscribeMessage('destroy')
     onDestroyMessage(
+        @MessageBody('room') room :string,
         @MessageBody('destroyDto') destroy: DestroyDto,
         @ConnectedSocket() client: Socket
     ){
-        client.broadcast.to(this.room).emit('onDestroy', destroy);
+
+        client.broadcast.to(room).emit('odDestroy', destroy);
     }
 
     //destroyCity
     @SubscribeMessage('destroyCity')
     onDestroyCityMessage(
+        @MessageBody('room') room :string,
         @MessageBody('destroyDto') destroy_city: DestroyDto,
         @ConnectedSocket() client: Socket
     ){
         console.log("na server sam uso");
-        client.broadcast.to(this.room).emit('onDestroyCity', destroy_city);
+        client.broadcast.to(room).emit('onDestroyCity', destroy_city);
     }
 
     //move
     @SubscribeMessage('move')
     onMoveMessage(
+        @MessageBody('room') room :string,
         @MessageBody('unit') unit: Unit,
         @ConnectedSocket() client: Socket
     ){
-        client.broadcast.to(this.room).emit('onMove', unit);
+        client.broadcast.to(room).emit('onMove', unit);
     }
 
     //produceUnit
     @SubscribeMessage('produceUnit')
     onProduceUnitMessage(
+        @MessageBody('room') room :string,
         @MessageBody('unit') unit: Unit,
         @ConnectedSocket() client: Socket
     ){
-        client.broadcast.to(this.room).emit('onProduceUnit', unit);
+        client.broadcast.to(room).emit('onProduceUnit', unit);
     }
 
     //produceFacility
     @SubscribeMessage('produceFacility')
     onProduceFacilityMessage(
+        @MessageBody('room') room :string,
         @MessageBody('facility') facility: BasicFacility,
         @ConnectedSocket() client: Socket
     ){
-        client.broadcast.to(this.room).emit('onProduceFacility', facility);
+        client.broadcast.to(room).emit('onProduceFacility', facility);
     }
 
     //nextTurn
     @SubscribeMessage('nextTurn')
     onNextTurn(
+        @MessageBody('room') room :string,
         @ConnectedSocket() client: Socket
     ){
-        client.broadcast.to(this.room).emit('onNextTurn');
+        console.log("primio i emitujem" + room);
+        client.broadcast.to(room).emit('onNextTurn');
     }
 
     //gameEnd
     @SubscribeMessage('endGame')
     onEndGame(
+        @MessageBody('room') room :string,
         @MessageBody('winner') winner: string,
         @ConnectedSocket() client: Socket
     ){
-        client.broadcast.to(this.room).emit('onEndGame', winner);
+        client.broadcast.to(room).emit('onEndGame', winner);
     }
 }

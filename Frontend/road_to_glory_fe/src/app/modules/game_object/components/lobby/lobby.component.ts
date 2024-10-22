@@ -10,15 +10,19 @@ import { GameObjectService } from '../../services/game_object.service';
 })
 export class LobbyComponent implements OnInit {
 
+
   constructor(
     private communication_service: CommunicationService,
     private readonly router: Router,
     private game_object_service: GameObjectService
   ){}
+  
   ngOnInit(): void {
 
+    
+
+    this.communication_service.joinRoom();
     //ovde ide ono za bazu sto smo pricali
-    this.communication_service.joinRoom("GameID");
 
     const player = sessionStorage.getItem('username')!;
     this.game_object_service.addPlayer(player)
@@ -26,9 +30,8 @@ export class LobbyComponent implements OnInit {
 
     this.communication_service.getJoin()
       .subscribe({
-        next:(message)=>{
-          console.log(message);
-          
+        next:(room)=>{
+          sessionStorage.setItem("room_id", room);
           this.router.navigate(['/game']);
         }
       });

@@ -5,9 +5,10 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { GameObjectModule } from './modules/game_object/game_object.module';
 import { AuthModule } from './modules/auth/auth.module';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { CommunicationModule } from './modules/communication/communication.module';
 import { ReactiveFormsModule } from '@angular/forms';
+import { JwtInterceptor } from './modules/auth/interceptors/jwt.interceptor';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,9 @@ import { ReactiveFormsModule } from '@angular/forms';
     AuthModule,
     HttpClientModule
   ],
-  providers: [],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
