@@ -4,13 +4,14 @@ import { GameComponent } from './modules/game_object/components/game/game.compon
 import { SignUpComponent } from './modules/auth/components/sign_up/sign_up.component';
 import { SignInComponent } from './modules/auth/components/sign-in/sign-in.component';
 import { LobbyComponent } from './modules/game_object/components/lobby/lobby.component';
+import { GameOverComponent } from './modules/game_object/components/game_over/game_over.component';
 
 const routes: Routes = [
-  //Trenutno sam postavio da game bude pocetna pozicija, ali to nece biti tako
-  {path: '', component: GameComponent},
+  {path: '', component: SignInComponent },
+  {path: 'game', component: GameComponent},
   {path: 'signup', component: SignUpComponent },
-  {path: 'signin', component: SignInComponent },
-  {path: 'lobby', component: LobbyComponent}
+  {path: 'lobby', component: LobbyComponent},
+  {path: 'game_over', component: GameOverComponent}
 ];
 
 @NgModule({

@@ -1,0 +1,12 @@
+<div class="game-over-container" [ngClass]="winner ? 'victory' : 'defeat'">
+    <h1 *ngIf="winner; else loserMessage">You reached glory!</h1>
+    
+    <ng-template #loserMessage>
+      <h1>You are a loser, {{ winner_name }} is glorious!</h1>
+    </ng-template>
+    
+    <!--<div class="game-over-options">
+      <button (click)="playAgain()">Play Again</button>
+      <button (click)="goToMainMenu()">Main Menu</button>
+    </div>-->
+</div>

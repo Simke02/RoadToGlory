@@ -28,8 +28,6 @@ export class SignInComponent {
     const username = this.signin_form.get('username')?.value;
     const password = this.signin_form.get('password')?.value;
     
-    //Pozovi metodu za slanje na server
-    //Prebaci na lobby
     this.auth_service.auth({
       username,
       password

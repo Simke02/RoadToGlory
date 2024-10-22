@@ -11,6 +11,7 @@ import { AddUpgradeMenuComponent } from './components/add_upgrade_menu/add_upgra
 import { getUserInfoInitializer } from '../initializer/get_user_info.initializer';
 import { CurrentUserService } from '../auth/services/current_user.service';
 import { AuthService } from '../auth/services/auth.service';
+import { GameOverComponent } from './components/game_over/game_over.component';
 
 
 
@@ -21,7 +22,8 @@ import { AuthService } from '../auth/services/auth.service';
     UpgradesMenuComponent,
     ProductionMenuComponent,
     LobbyComponent,
-    AddUpgradeMenuComponent
+    AddUpgradeMenuComponent,
+    GameOverComponent
   ],
   imports: [
     CommonModule

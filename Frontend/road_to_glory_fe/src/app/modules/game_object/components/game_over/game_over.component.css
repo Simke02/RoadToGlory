@@ -1,0 +1,38 @@
+html, body {
+    height: 100%;
+    margin: 0;
+  }
+  
+  .game-over-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 16px);
+    text-align: center;
+    color: white;
+  }
+  
+  .victory {
+    background-color: #4CAF50; /* Green for victory */
+  }
+  
+  .defeat {
+    background-color: #f44336; /* Red for defeat */
+  }
+  
+  h1 {
+    font-size: 3rem;
+    margin: 0;
+  }
+  
+  .game-over-options {
+    margin-top: 20px;
+  }
+  
+  button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 1.2rem;
+  }
+  

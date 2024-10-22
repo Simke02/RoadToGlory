@@ -6,7 +6,7 @@ import { UserInfo } from "src/app/common/models/dto/user_info.dto";
 
 @Injectable()
 export class AuthService {
-    
+
     constructor(private http: HttpClient) {}
 
     auth(user: { username: string; password: string }): Observable<UserInfo> {
@@ -19,11 +19,8 @@ export class AuthService {
         firstName: string;
         lastName: string;
       }) {
-        console.log('sad ce da se pozove kontroler');
         return this.http.post(environment.baseApiUrl + '/auth', user);
     }
-
-    
     getUserInfo(): Observable<UserInfo> {
       return this.http.get<UserInfo>(environment.baseApiUrl + '/auth/me');
     }

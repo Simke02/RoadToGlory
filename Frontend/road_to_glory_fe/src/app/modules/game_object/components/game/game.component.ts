@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, Renderer2 } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, Renderer2 } from '@angular/core';
 import { GameObjectService } from '../../services/game_object.service';
 import { CommunicationService } from 'src/app/modules/communication/services/communication.service';
 import { GameService } from '../../services/game.service';
@@ -14,6 +14,9 @@ import { ProductionDto } from 'src/app/common/models/dto/production.dto';
 import { Upgrade } from 'src/app/common/models/upgrade/upgrade.model';
 import { CurrentUserService } from 'src/app/modules/auth/services/current_user.service';
 import { map } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from 'src/app/modules/auth/services/auth.service';
+import { City } from 'src/app/common/models/city/city.model';
 
 @Component({
   selector: 'app-game',
@@ -23,12 +26,15 @@ import { map } from 'rxjs';
 export class GameComponent implements OnInit {
   private player: string="";
   private room:string="0";
+  private left: boolean = true;
   terrain: string[][] = [];
   private player_units: Unit[] = [];
   private enemy_units: Unit[] = [];
   private player_resource_facilities: ResourceFacility[] = [];
   private player_production_facilities: Facility[] = [];
   private enemy_facilities: BasicFacility[] = [];
+  private player_city: City = { x_coor: -1, y_coor: -1, health: 0, icon: ""};
+  private enemy_city: City = { x_coor: -1, y_coor: -1, health: 0, icon: ""};
   player_upgrades: Upgrade[] = []; //Koje upgradove ima korisnik i koliko kosta da se postave na jedinicu
   gold: number = 500;//50;
   available_resources: {grain: number, iron: number} = {grain: 1000, iron: 1000};
@@ -66,110 +72,206 @@ export class GameComponent implements OnInit {
     }
 
   }
-
-  ngOnInit(): void {
-      this.game_object_service.getTerrain()
-      .subscribe({
-        next: (terrain)=>{
-          this.terrain = terrain;
-        }
-      })
       
       this.communication_service.getLeave()
       .subscribe({
         next:(message)=>{
           console.log(message);
+          
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+
+    this.player = sessionStorage.getItem('username')!;
+
+    //Kreiranje igre
+    this.game_object_service.createGame()
+    .subscribe({
+      next: (new_game) => {
+        console.log(new_game);
+        if(new_game.first_player === this.player){
+          this.player_city = new_game.first_city;
+          this.enemy_city = new_game.second_city;
+          this.left = true;
         }
-      });
-
-
-      this.communication_service.getAttack()
-      .subscribe({
-        next: (message)=>{
-          console.log(message);
+        else if(new_game.second_player === this.player){
+          this.player_city = new_game.second_city;
+          this.enemy_city = new_game.first_city;
+          this.left = false;
+          this.my_turn = false;
+          this.gold -= 2;
         }
-      });
+      }
+    })
 
-      this.communication_service.getDestroy()
-      .subscribe({
-        next:(message)=>{
-          console.log(message);
-        }
-      });
+    this.game_object_service.getTerrain().subscribe({
+      next: (terrain) => {
+        this.terrain = terrain;
 
-      this.communication_service.getMove()
-      .subscribe({
-        next:(unit)=>{
-          if(this.game_service.isUnit(unit)){
-            const index = this.enemy_units.findIndex(u => u.id === unit.id);
-            const old_unit = this.enemy_units[index];
-            if (index !== -1) {
-              this.enemy_units.splice(index, 1);
-            }
-            this.enemy_units.push(unit);
+        setTimeout(() => {
+          this.displayIconAtCell(this.player_city.x_coor, this.player_city.y_coor, this.player_city.icon, this.left);
+          this.displayIconAtCell(this.enemy_city.x_coor, this.enemy_city.y_coor, this.enemy_city.icon, !this.left);
+        });
+      }
+    });
+      
+    this.communication_service.getLeave()
+    .subscribe({
+      next:(message)=>{
+        console.log(message);
+      }
+    });
 
-            //2 Skinemo ikonicu i postavimo novu
-            this.removeIconFromCell(old_unit.x_coor, old_unit.y_coor);
-            this.displayIconAtCell(unit.x_coor, unit.y_coor, unit.icon);
+
+    this.communication_service.getAttack()
+    .subscribe({
+      next: (attack)=>{
+        if(attack.attacker.health > 0){
+          if(attack.defender.health <= 0){
+            const i = this.enemy_units.findIndex(unit => unit.id === attack.attacker.id);
+            this.removeIconFromCell(this.enemy_units[i].x_coor, this.enemy_units[i].y_coor);
+            this.displayIconAtCell(attack.attacker.x_coor, attack.attacker.y_coor, attack.attacker.icon, !this.left);
           }
+          this.enemy_units[this.enemy_units.findIndex(unit => unit.id === attack.attacker.id)] = attack.attacker;
         }
-      });
+        else {
+          this.enemy_units.splice(this.enemy_units.findIndex(unit => unit.id === attack.attacker.id), 1);
+          this.removeIconFromCell(attack.attacker.x_coor, attack.attacker.y_coor);
+        }
 
-      this.communication_service.getProduceUnit()
-      .subscribe({
-        next:(unit)=>{
-          if(this.game_service.isUnit(unit)){
-            this.enemy_units.push(unit);
-            this.displayIconAtCell(unit.x_coor, unit.y_coor, unit.icon);
+        if(attack.defender.health > 0)
+          this.player_units[this.player_units.findIndex(unit => unit.id === attack.defender.id)] = attack.defender;
+        else {
+          this.player_units.splice(this.player_units.findIndex(unit => unit.id === attack.defender.id), 1);
+          this.removeIconFromCell(attack.defender.x_coor, attack.defender.y_coor);
+        }
+
+        console.log(this.player_units);
+        console.log(this.enemy_units);
+      }
+    });
+
+    this.communication_service.getDestroy()
+    .subscribe({
+      next:(destroy)=>{
+        if(destroy.object.health <= 0){
+          this.removeIconFromCell(destroy.object.x_coor, destroy.object.y_coor);
+          if(this.game_service.isProductionFacility(destroy.object))
+            this.player_production_facilities.splice(this.player_production_facilities.findIndex(facility => facility.x_coor === destroy.object.x_coor && facility.y_coor === destroy.object.y_coor), 1);
+          else if(this.game_service.isResourceFacility(destroy.object))
+            this.player_resource_facilities.splice(this.player_resource_facilities.findIndex(facility => facility.x_coor === destroy.object.x_coor && facility.y_coor === destroy.object.y_coor), 1);
+          
+          const i = this.enemy_units.findIndex(unit => unit.id === destroy.attacker.id);
+          this.removeIconFromCell(this.enemy_units[i].x_coor, this.enemy_units[i].y_coor);
+          this.displayIconAtCell(destroy.attacker.x_coor, destroy.attacker.y_coor, destroy.attacker.icon, !this.left);
+        }
+        else {
+          if(this.game_service.isProductionFacility(destroy.object))
+            this.player_production_facilities[this.player_production_facilities.findIndex(facility => facility.x_coor === destroy.object.x_coor && facility.y_coor === destroy.object.y_coor)] = destroy.object;
+          else if(this.game_service.isResourceFacility(destroy.object))
+            this.player_resource_facilities[this.player_resource_facilities.findIndex(facility => facility.x_coor === destroy.object.x_coor && facility.y_coor === destroy.object.y_coor)] = destroy.object;
+        }
+
+        this.enemy_units[this.enemy_units.findIndex(unit => unit.id === destroy.attacker.id)] = destroy.attacker;
+
+        console.log(this.player_production_facilities);
+        console.log(this.player_resource_facilities);
+        console.log(this.enemy_units);
+      }
+    });
+
+    this.communication_service.getDestroyCity()
+    .subscribe({
+      next: (destroy) => {
+        if(destroy.object.health <= 0){
+          this.removeIconFromCell(destroy.object.x_coor, destroy.object.y_coor);
+          this.player_city = { x_coor: -1, y_coor: -1, health: 0, icon: ""};
+
+          const i = this.enemy_units.findIndex(unit => unit.id === destroy.attacker.id);
+          this.removeIconFromCell(this.enemy_units[i].x_coor, this.enemy_units[i].y_coor);
+          this.displayIconAtCell(destroy.attacker.x_coor, destroy.attacker.y_coor, destroy.attacker.icon, !this.left);
+        }
+        else
+          this.player_city = destroy.object;
+
+        this.enemy_units[this.enemy_units.findIndex(unit => unit.id === destroy.attacker.id)] = destroy.attacker;
+
+        console.log(this.player_city);
+        console.log(this.enemy_units);
+      }
+    })
+
+    this.communication_service.getMove()
+    .subscribe({
+      next:(unit)=>{
+        if(this.game_service.isUnit(unit)){
+          const index = this.enemy_units.findIndex(u => u.id === unit.id);
+          const old_unit = this.enemy_units[index];
+          if (index !== -1) {
+            this.enemy_units.splice(index, 1);
           }
-        }
-      });
+          this.enemy_units.push(unit);
 
-      this.communication_service.getProduceFacility()
-      .subscribe({
-        next:(facility)=>{
-          if(this.game_service.isBasicFacility(facility)){
-            this.enemy_facilities.push(facility);
-            this.displayIconAtCell(facility.x_coor, facility.y_coor, facility.icon);
+          //2 Skinemo ikonicu i postavimo novu
+          this.removeIconFromCell(old_unit.x_coor, old_unit.y_coor);
+          this.displayIconAtCell(unit.x_coor, unit.y_coor, unit.icon, !this.left);
+        }
+      }
+    });
+
+    this.communication_service.getProduceUnit()
+    .subscribe({
+      next:(unit)=>{
+        if(this.game_service.isUnit(unit)){
+          this.enemy_units.push(unit);
+          this.displayIconAtCell(unit.x_coor, unit.y_coor, unit.icon, !this.left);
+        }
+      }
+    });
+
+    this.communication_service.getProduceFacility()
+    .subscribe({
+      next:(facility)=>{
+        if(this.game_service.isBasicFacility(facility)){
+          this.enemy_facilities.push(facility);
+          this.displayIconAtCell(facility.x_coor, facility.y_coor, facility.icon, !this.left);
+        }
+      }
+    });
+
+    this.communication_service.getNextTurn()
+    .subscribe({
+      next:()=>{
+        //Moramo i serveru da posaljemo da je doslo do sledeceg poteza
+        this.game_object_service.nextTurn({player_name: this.player, left: this.left})
+        .subscribe({
+          next: () => {
+            this.my_turn = true;
+            this.player_units.forEach(unit => {
+              unit.finished_turn = false;
+              unit.steps_left = unit.steps;
+            });
+            this.gold += 2;
+            this.player_resource_facilities.forEach(facility => {
+              if(facility.type === "iron")
+                this.available_resources.iron += 7;
+              else if(facility.type === "grain")
+                this.available_resources.grain += 10;
+            })
           }
-        }
-      });
+        })
+      }
+    });
 
-      //Da za prvi potez ne dodaje gold za ovog koji drugi igra
-      this.communication_service.getNextTurn()
-      .subscribe({
-        next:()=>{
-          console.log('%d %d %d', this.gold, this.available_resources.iron, this.available_resources.grain);
-          this.my_turn = true;
-          this.player_units.forEach(unit => {
-            unit.finished_turn = false;
-            unit.steps_left = unit.steps;
-          });
-          this.gold += 2;
-          this.player_resource_facilities.forEach(facility => {
-            if(facility.type === "iron")
-              this.available_resources.iron += 7;
-            else if(facility.type === "grain")
-              this.available_resources.grain += 10;
-          })
-          console.log('%d %d %d', this.gold, this.available_resources.iron, this.available_resources.grain);
-        }
-      });
+    this.communication_service.getEndGame()
+    .subscribe({
+      next:(message)=>{
+        sessionStorage.setItem('winner', message);
+        this.router.navigate(['/game_over']);
+      }
+    });
 
-      this.communication_service.getEndGame()
-      .subscribe({
-        next:(message)=>{
-          console.log(message);
-        }
-      });
-
-
-      this.communication_service.getCreateGame()
-      .subscribe({
-        next: (message)=>{
-          console.log(message);
-        }
-      });
   }
 
   getColor(value: string): string {
@@ -208,25 +310,22 @@ export class GameComponent implements OnInit {
               
               console.log(position);
 
-              //Moras da izmenis da proverava da li je u njegovom delu mape!!!!!!!!!!!!!!!!!!!!!!!!!!!!
               //Sta sve mozes da izgradis
-              if(position.type === ""){              
+              if(position.type === "" && ((this.left && col < this.terrain[0].length / 5) || (!this.left && col >= 4 * this.terrain[0].length / 5))){              
                 this.game_object_service.whatCanBeBuilt(row, col)
                 .subscribe({
                   next: (buildings) => {
-                    //treba da se pozove komponenta koja ce to da sadrzi
-                    this.buildings_menu = true;
                     buildings.gold_cost.unshift(this.gold);
                     this.buildings = buildings;
                     this.selected_x = row;
                     this.selected_y = col;
+                    this.buildings_menu = true;
                   }
                 })  
               }
 
               //Sta sve jedinica moze da uradi
-              //Moras da izmenis da proverava username igraca!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-              else if(position.owner === "andrija" && position.type === "unit"){
+              else if(position.owner === this.player && position.type === "unit"){
                 let unit = this.player_units.find(u => u.x_coor === row && u.y_coor === col);
           
                 if(unit && !unit.finished_turn){
@@ -252,37 +351,34 @@ export class GameComponent implements OnInit {
                 }
               }
               //Odabir upgradova za izuciti
-              //Moras da izmenis da proverava username igraca!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-              else if(position.owner === "andrija" && position.type === "city"){
+              else if(position.owner === this.player && position.type === "city"){
                 this.game_object_service.whatUpgradesExist()
                 .subscribe({
                     next: (upgrades) => {
-                      //let filteredUpgrades: UpgradesDto = {upgrade_name: [], gold_cost: []};
                       upgrades.upgrade_name.forEach((name, index) => {
-                        // Only add items to filteredUpgrades if the name is not in player_upgrades
                         if (!this.player_upgrades.some(upgrade => upgrade.name === name)) {
                           this.upgrades.upgrade_name.push(name);
                           this.upgrades.gold_cost.push(upgrades.gold_cost[index]);
                         }
                       });
-                      //treba da se pozove komponenta koja ce to da sadrzi
-                      //Treba da prodjes kroz sve koje ti imas i da ih izbacis iz ponude
                       this.upgrades_menu = true;
-                      //Posalji koliko ima para
                     }
                 })
               }
 
               //Odabir pravljenja jedinica
-              //Moras da izmenis da proverava username igraca!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-              else if(position.owner === "andrija" && position.type === "facility"){
+              else if(position.owner === this.player && position.type === "facility"){
                 const facility = this.player_production_facilities.find(f => f.x_coor === row && f.y_coor === col);
                 //Moras da vidis da li je levi ili desni igrac
-                this.game_object_service.getPosition(row, col + 1)
+                let new_col = col;
+                if(this.left)
+                  new_col++;
+                else
+                  new_col--;
+                this.game_object_service.getPosition(row, new_col)
                 .subscribe({
                     next: (position) => {
                       if(position.type === ""){
-                        //Treba da se prikaze u nekoj komponenti sta moze da se proizvede tu
                         this.production_menu = true;
                         this.selected_x = row;
                         this.selected_y = col;
@@ -296,6 +392,7 @@ export class GameComponent implements OnInit {
         })
   }
 
+
   onCellRightClick(row: number, col: number, event: MouseEvent) {
     event.preventDefault();
     const move = this.possible_moves.find(m => m.x_coor === row && m.y_coor === col);
@@ -304,30 +401,127 @@ export class GameComponent implements OnInit {
       this.add_upgrades_menu = false;
 
     if(move){
-      //Mora da se proveri sta je na poziciji i da se na osnovu toga zove attack, destroy ili move
-
       //attack
+      if(move.type === "unit"){
+        const defender = this.enemy_units.find(d => d.x_coor === row && d.y_coor === col);
 
+        if(defender){
+          this.game_object_service.attack({attacker: this.selected_unit, defender })
+          .subscribe({
+            next: (attack) => {
+              if(attack.attacker.health > 0){
+                if(attack.defender.health <= 0){
+                  this.removeIconFromCell(this.selected_unit.x_coor, this.selected_unit.y_coor);
+                  this.displayIconAtCell(attack.attacker.x_coor, attack.defender.y_coor, attack.attacker.icon, this.left);
+                }
+                this.player_units[this.player_units.findIndex(unit => unit.id === attack.attacker.id)] = attack.attacker;
+              }
+              else {
+                this.player_units.splice(this.player_units.findIndex(unit => unit.id === attack.attacker.id), 1);
+                this.removeIconFromCell(attack.attacker.x_coor, attack.attacker.y_coor);
+              }
+
+              if(attack.defender.health > 0)
+                this.enemy_units[this.enemy_units.findIndex(unit => unit.id === attack.defender.id)] = attack.defender;
+              else {
+                this.enemy_units.splice(this.enemy_units.findIndex(unit => unit.id === attack.defender.id), 1);
+                this.removeIconFromCell(attack.defender.x_coor, attack.defender.y_coor);
+              }
+
+              console.log(this.player_units);
+              console.log(this.enemy_units);
+
+              this.removeRedBorders();
+              this.removeYellowBorder();
+
+              this.communication_service.sendAttack(attack);
+            }
+          })
+        }
+      }
       //destroy
+      else if(move.type === "facility" || move.type === "resource"){
+        const object = this.enemy_facilities.find(f => f.x_coor === row && f.y_coor === col);
 
-      //move
-      this.game_object_service.move({unit: this.selected_unit, final_position: move})
-      .subscribe({
-        next: (unit) => {
-          //1 Na osnovu id izbacis iz player_units taj unit i dodas ga opet
-          const index = this.player_units.findIndex(u => u.id === unit.id);
-          const old_unit = this.player_units[index];
-          if (index !== -1) {
-            this.player_units.splice(index, 1);
+        if(object){
+          this.game_object_service.destroy({attacker: this.selected_unit, object})
+          .subscribe({
+            next: (destroy) => {
+              if(destroy.object.health <= 0){
+                this.removeIconFromCell(destroy.object.x_coor, destroy.object.y_coor);
+                this.enemy_facilities.splice(this.enemy_facilities.findIndex(facility => facility.x_coor === destroy.object.x_coor && facility.y_coor === destroy.object.y_coor), 1);
+                this.removeIconFromCell(this.selected_unit.x_coor, this.selected_unit.y_coor);
+                this.displayIconAtCell(destroy.attacker.x_coor, destroy.attacker.y_coor, destroy.attacker.icon, this.left);
+              }
+              else {
+                this.enemy_facilities[this.enemy_facilities.findIndex(facility => facility.x_coor === destroy.object.x_coor && facility.y_coor === destroy.object.y_coor)] = destroy.object;
+              }
+
+              this.player_units[this.player_units.findIndex(unit => unit.id === destroy.attacker.id)] = destroy.attacker;
+
+              this.removeRedBorders();
+              this.removeYellowBorder();
+
+              console.log(this.enemy_facilities);
+              console.log(this.player_units);
+
+              this.communication_service.sendDestroy(destroy);
+            }
+          })
+        }
+      }
+      //destroy city
+      else if(move.type === "city"){
+        this.game_object_service.destroy({attacker: this.selected_unit, object: this.enemy_city})
+        .subscribe({
+          next: (destroy) => {
+            if(destroy.object.health <= 0){
+              this.removeIconFromCell(destroy.object.x_coor, destroy.object.y_coor);
+              this.enemy_city = { x_coor: -1, y_coor: -1, health: 0, icon: ""};
+              this.removeIconFromCell(this.selected_unit.x_coor, this.selected_unit.y_coor);
+              this.displayIconAtCell(destroy.attacker.x_coor, destroy.attacker.y_coor, destroy.attacker.icon, this.left);
+            }
+            else {
+              this.enemy_city = destroy.object;
+            }
+
+            this.player_units[this.player_units.findIndex(unit => unit.id === destroy.attacker.id)] = destroy.attacker;
+
+            this.removeRedBorders();
+            this.removeYellowBorder();
+
+            console.log(this.enemy_city);
+            console.log(this.player_units);
+
+            this.communication_service.sendDestroyCity(destroy);
+
+            if(destroy.object.health <= 0){
+              this.communication_service.sendEndGame(this.player);
+              sessionStorage.setItem('winner', this.player);
+              this.router.navigate(['/game_over']);
+            }
           }
-          this.player_units.push(unit);
-          //2 Skinemo ikonicu i postavimo novu
-          this.removeIconFromCell(old_unit.x_coor, old_unit.y_coor);
-          this.displayIconAtCell(unit.x_coor, unit.y_coor, unit.icon);
+        })
+      }
+      //move
+      else if(move.type === ""){
+        this.game_object_service.move({unit: this.selected_unit, final_position: move})
+        .subscribe({
+          next: (unit) => {
+            //1 Na osnovu id izbacis iz player_units taj unit i dodas ga opet
+            const index = this.player_units.findIndex(u => u.id === unit.id);
+            const old_unit = this.player_units[index];
+            if (index !== -1) {
+              this.player_units.splice(index, 1);
+            }
+            this.player_units.push(unit);
+            //2 Skinemo ikonicu i postavimo novu
+            this.removeIconFromCell(old_unit.x_coor, old_unit.y_coor);
+            this.displayIconAtCell(unit.x_coor, unit.y_coor, unit.icon, this.left);
           
-          //3
-          this.removeRedBorders();
-          this.removeYellowBorder();
+            //3
+            this.removeRedBorders();
+            this.removeYellowBorder();
 
           //4 posaljemo drugom igracu promenu
           this.communication_service.sendMove(this.room.toString(), unit);
@@ -346,13 +540,14 @@ export class GameComponent implements OnInit {
           this.player_production_facilities.push(facility);
         else if(this.game_service.isResourceFacility(facility))
           this.player_resource_facilities.push(facility);
-        this.displayIconAtCell(this.selected_x, this.selected_y, selected_option.building_name);
+        this.displayIconAtCell(this.selected_x, this.selected_y, selected_option.building_name, this.left);
         this.selected_x = -1;
         this.selected_y = -1;
         this.gold -= selected_option.gold_cost;
         this.buildings = {building_names: [], gold_cost: []};
         this.communication_service.sendProduceFacility(this.room , facility);
         this.removeYellowBorder();
+        console.log(this.player_resource_facilities);
       }
     })
   }
@@ -368,11 +563,16 @@ export class GameComponent implements OnInit {
 
   //Odavde pozivas proizvodnju jedinica i cuvas je na odgovarajucem mestu
   handleProductionMenu(selected_option: {unit_type: string, unit_name: string, iron_cost: number, grain_cost: number}){
-    this.game_object_service.produceUnit(selected_option.unit_type, selected_option.unit_name, this.selected_x, this.selected_y + 1)
+    let new_y = this.selected_y;
+    if(this.left)
+      new_y++;
+    else
+      new_y--;
+    this.game_object_service.produceUnit(selected_option.unit_type, selected_option.unit_name, this.selected_x, new_y)
     .subscribe({
       next: (unit) => {
         this.player_units.push(unit);
-        this.displayIconAtCell(unit.x_coor, unit.y_coor, selected_option.unit_type);
+        this.displayIconAtCell(unit.x_coor, unit.y_coor, selected_option.unit_type, this.left);
         this.selected_x = -1;
         this.selected_y = -1;
         this.available_resources.grain -= selected_option.grain_cost;
@@ -441,12 +641,18 @@ export class GameComponent implements OnInit {
     this.removeYellowBorder();
   }
 
-  displayIconAtCell(row: number, col: number, iconType: string) {
+  displayIconAtCell(row: number, col: number, iconType: string, facing: boolean) {
     const cell = this.el.nativeElement.querySelector(`.row:nth-child(${row + 1}) .cell:nth-child(${col + 1})`);
     if (cell) {
       const iconElement = this.renderer.createElement('img');
       this.renderer.setAttribute(iconElement, 'src', `assets/icons/${iconType}-icon.png`);
       this.renderer.addClass(iconElement, 'icon');
+
+      //Ako je levi igrac facing ce biti true
+      if (!facing) {
+        this.renderer.setStyle(iconElement, 'transform', 'rotateY(180deg)');
+      }
+
       this.renderer.appendChild(cell, iconElement);
     }
   }
