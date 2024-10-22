@@ -13,6 +13,8 @@ import { BasicFacility } from "src/app/common/models/basic_facility.model";
 import { UpgradesDto } from "src/app/common/models/dto/upgrades.dto";
 import { Position } from "src/app/common/models/position/position.model";
 import { Upgrade } from "src/app/common/models/upgrade/upgrade.model";
+import { CreateGameDto } from "src/app/common/models/dto/create_game.dto";
+import { NextTurnDto } from "src/app/common/models/dto/next_turn.dto";
 
 @Injectable()
 export class GameObjectService {
@@ -61,5 +63,17 @@ export class GameObjectService {
 
     getPosition(x_coor: number, y_coor: number): Observable<Position> {
         return this.http.get<Position>(environment.baseApiUrl + `/game-object/getPosition/${x_coor}/${y_coor}`);
+    }
+
+    addPlayer(player_name: string): Observable<void> {
+        return this.http.post<void>(environment.baseApiUrl + `/game-object/addPlayer`, { player_name });
+    }
+
+    createGame(): Observable<CreateGameDto> {
+        return this.http.get<CreateGameDto>(environment.baseApiUrl + `/game-object/createGame`);
+    }
+
+    nextTurn(nextTurnDto: NextTurnDto): Observable<void> {
+        return this.http.post<void>(environment.baseApiUrl + `/game-object/nextTurn`, nextTurnDto);
     }
 }

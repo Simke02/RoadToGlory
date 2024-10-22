@@ -90,7 +90,17 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
         @MessageBody('destroyDto') destroy: DestroyDto,
         @ConnectedSocket() client: Socket
     ){
-        client.broadcast.to(this.room).emit('odDestroy', destroy);
+        client.broadcast.to(this.room).emit('onDestroy', destroy);
+    }
+
+    //destroyCity
+    @SubscribeMessage('destroyCity')
+    onDestroyCityMessage(
+        @MessageBody('destroyDto') destroy_city: DestroyDto,
+        @ConnectedSocket() client: Socket
+    ){
+        console.log("na server sam uso");
+        client.broadcast.to(this.room).emit('onDestroyCity', destroy_city);
     }
 
     //move

@@ -38,6 +38,10 @@ export class CommunicationService {
     this.socket.emit('destroy', {'destroyDto': destroy});
   }
 
+  sendDestroyCity(destroy_city: DestroyDto): void{
+    this.socket.emit('destroyCity', {'destroyDto': destroy_city});
+  }
+
   sendMove(unit: Unit):void{
     this.socket.emit('move', {"unit": unit});
   }
@@ -117,6 +121,20 @@ export class CommunicationService {
 
       return()=>{
         this.socket.off('onDestroy', listener);
+      }
+    });
+  }
+
+  getDestroyCity(): Observable<DestroyDto>{
+    return new Observable(observer=>{
+      const listener = (destroy_city: DestroyDto) =>{
+        observer.next(destroy_city);
+      };
+
+      this.socket.on('onDestroyCity', listener);
+
+      return()=>{
+        this.socket.off('onDestroyCity', listener);
       }
     });
   }

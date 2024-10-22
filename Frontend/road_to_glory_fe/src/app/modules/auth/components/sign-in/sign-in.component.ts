@@ -26,21 +26,18 @@ export class SignInComponent {
     const username = this.signin_form.get('username')?.value;
     const password = this.signin_form.get('password')?.value;
     
-    //Pozovi metodu za slanje na server
-    //Prebaci na lobby
     this.auth_service.auth({
       username,
       password
     }).subscribe({
       next:res=>{
-        console.log(res);
-        localStorage.setItem("username", res.username);
+        sessionStorage.setItem('username', res.username);
+        this.router.navigate(['/lobby']);
       }
     })
-    this.router.navigate(['/lobby'])
   }
 
   navigateToSignup() {
-    this.router.navigate(['/singup']);
+    this.router.navigate(['/signup']);
   }
 }

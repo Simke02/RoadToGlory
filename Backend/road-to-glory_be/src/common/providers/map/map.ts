@@ -386,7 +386,7 @@ export class Map{
         positions[12][0] = {x_coor: 12, y_coor: 0, terrain: "plains", owner: "", type: ""}
         positions[12][1] = {x_coor: 12, y_coor: 1, terrain: "plains", owner: "", type: ""}
         positions[12][2] = {x_coor: 12, y_coor: 2, terrain: "plains", owner: "", type: ""}
-        positions[12][3] = {x_coor: 12, y_coor: 3, terrain: "plains", owner: "andrija", type: "city"}
+        positions[12][3] = {x_coor: 12, y_coor: 3, terrain: "plains", owner: "", type: ""}//
         positions[12][4] = {x_coor: 12, y_coor: 4, terrain: "plains", owner: "", type: ""}
         positions[12][5] = {x_coor: 12, y_coor: 5, terrain: "plains", owner: "", type: ""}
         positions[12][6] = {x_coor: 12, y_coor: 6, terrain: "forest", owner: "", type: ""}
@@ -404,7 +404,7 @@ export class Map{
         positions[12][18] = {x_coor: 12, y_coor: 18, terrain: "plains", owner: "", type: ""}
         positions[12][19] = {x_coor: 12, y_coor: 19, terrain: "hills", owner: "", type: ""}
         positions[12][20] = {x_coor: 12, y_coor: 20, terrain: "plains", owner: "", type: ""}
-        positions[12][21] = {x_coor: 12, y_coor: 21, terrain: "plains", owner: "", type: ""}
+        positions[12][21] = {x_coor: 12, y_coor: 21, terrain: "plains", owner: "", type: ""}//
         positions[12][22] = {x_coor: 12, y_coor: 22, terrain: "plains", owner: "", type: ""}
         positions[12][23] = {x_coor: 12, y_coor: 23, terrain: "plains", owner: "", type: ""}
         positions[12][24] = {x_coor: 12, y_coor: 24, terrain: "plains", owner: "", type: ""}

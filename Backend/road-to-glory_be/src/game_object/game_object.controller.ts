@@ -8,6 +8,7 @@ import { Unit } from 'src/common/models/unit/unit.model';
 import { AttackDto } from 'src/common/models/dto/attack.dto';
 import { DestroyDto } from 'src/common/models/dto/destroy.dto';
 import { MoveDto } from 'src/common/models/dto/move.dto';
+import { NextTurnDto } from 'src/common/models/dto/next_turn.dto';
 
 @Controller('game-object')
 export class GameObjectController {
@@ -109,5 +110,24 @@ export class GameObjectController {
       const x = parseInt(x_coor, 10);
       const y = parseInt(y_coor, 10);
       return this.gameObjectService.getPosition(x, y);
+  }
+
+  @Post('addPlayer')
+  //@UseGuards(JwtGuard)
+  addPlayer(
+    @Body() body: { player_name: string }) {
+      return this.gameObjectService.addPlayer(body.player_name);
+  }
+
+  @Get('createGame')
+  createGame() {
+    return this.gameObjectService.createGame();
+  }
+
+  @Post('nextTurn')
+  //@UseGuards(JwtGuard)
+  nextTurn(
+    @Body() nextTurnDto: NextTurnDto) {
+      return this.gameObjectService.nextTurn(nextTurnDto.player_name, nextTurnDto.left);
   }
 }

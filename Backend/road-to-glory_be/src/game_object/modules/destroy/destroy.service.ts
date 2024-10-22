@@ -48,7 +48,8 @@ export class DestroyService {
 
             if(this.map.getOwner(current.x_coor, current.y_coor) !== player)
                 if(this.map.getType(current.x_coor, current.y_coor) === "facility" ||
-                    this.map.getType(current.x_coor, current.y_coor) === "resource")
+                    this.map.getType(current.x_coor, current.y_coor) === "resource" ||
+                    this.map.getType(current.x_coor, current.y_coor) === "city")
                     objects_in_range.push(current);  
 
             /*if(object_in_range)

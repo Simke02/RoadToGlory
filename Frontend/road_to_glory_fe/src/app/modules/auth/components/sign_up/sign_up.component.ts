@@ -41,7 +41,7 @@ export class SignUpComponent{
       lastName:last_name
     }).subscribe();
 
-    this.router.navigate(['/signin']);
+    this.router.navigate(['']);
 
   }
 

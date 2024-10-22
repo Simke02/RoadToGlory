@@ -8,6 +8,7 @@ import { UpgradesMenuComponent } from './components/upgrades_menu/upgrades_menu.
 import { ProductionMenuComponent } from './components/production_menu/production_menu.component';
 import { LobbyComponent } from './components/lobby/lobby.component';
 import { AddUpgradeMenuComponent } from './components/add_upgrade_menu/add_upgrade_menu.component';
+import { GameOverComponent } from './components/game_over/game_over.component';
 
 
 
@@ -18,7 +19,8 @@ import { AddUpgradeMenuComponent } from './components/add_upgrade_menu/add_upgra
     UpgradesMenuComponent,
     ProductionMenuComponent,
     LobbyComponent,
-    AddUpgradeMenuComponent
+    AddUpgradeMenuComponent,
+    GameOverComponent
   ],
   imports: [
     CommonModule

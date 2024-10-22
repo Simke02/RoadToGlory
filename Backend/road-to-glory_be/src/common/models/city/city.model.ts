@@ -10,6 +10,6 @@ export class City implements BasicFacility{
         this.x_coor = x_coor;
         this.y_coor = y_coor;
         this.health = 5000;
-        this.icon = "";
+        this.icon = "city";
     }
 }

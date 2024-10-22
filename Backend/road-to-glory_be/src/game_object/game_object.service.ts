@@ -12,6 +12,7 @@ import { PositionStep } from 'src/common/models/position/position_step.model';
 import { UpgradeService } from './modules/upgrade/upgrade.service';
 import { Upgrade } from 'src/common/models/upgrade/upgrade.model';
 import { Position } from 'src/common/models/position/position.model';
+import { City } from 'src/common/models/city/city.model';
 
 @Injectable()
 export class GameObjectService {
@@ -24,7 +25,9 @@ export class GameObjectService {
   private upgrade_service: UpgradeService;
 
   //Potencijalni atributi
-  private player: string;
+  private player: string; //Koji player je trenutno na potezu
+  private left: boolean; //Da li je levi igrac u pitanju
+  private players: string[];
 
   constructor(@Inject('MAP') private readonly map: Map) {
     this.attack_service = new AttackService(map);
@@ -35,17 +38,15 @@ export class GameObjectService {
     this.unit_production_service = new UnitProductionService(map);
     this.upgrade_service = new UpgradeService();
 
-    this.player = "andrija"; //Pretpostavljamo da sadrzi username playera koji trenutno izvrsava potez
+    this.player = ""; //Pretpostavljamo da sadrzi username playera koji trenutno izvrsava potez
+    this.players = [];
+    this.left = true;
   }
 
   //Sta moze da bude izgradjeno na jednom polju
-
-  //Ovde moras da izmenis da se vrsi provera da li ga nesto ne okruzuje gde ne moze
   whatCanBeBuilt(x_coor: number, y_coor: number): {building_names: string[], gold_cost: number[]} {
-    
-    //OVE PROVERE SAM URADIO SAMO ZA IGRACA KOJI JE LEVO, MORAS I ZA DRUGOG DA ODRADIS
-
-    if(y_coor > 0 && this.map.getType(x_coor, y_coor-1) === "facility"){
+    if((this.left && y_coor > 0 && this.map.getType(x_coor, y_coor-1) === "facility") 
+      || (!this.left && (y_coor + 1) < this.map.getNumberOfColumns() && this.map.getType(x_coor, y_coor+1) === "facility")){
       return {
         building_names: [],
         gold_cost: []
@@ -53,8 +54,8 @@ export class GameObjectService {
     }
     
     let facilities = {facility_name: [], gold_cost: []}
-    //OVE PROVERE SAM URADIO SAMO ZA IGRACA KOJI JE LEVO, MORAS I ZA DRUGOG DA ODRADIS
-    if((y_coor + 1) < this.map.getNumberOfColumns() && (this.map.getType(x_coor, y_coor + 1) === "" || this.map.getType(x_coor, y_coor + 1) === "unit")){
+    if((this.left && (y_coor + 1) < this.map.getNumberOfColumns() && (this.map.getType(x_coor, y_coor + 1) === "" || this.map.getType(x_coor, y_coor + 1) === "unit"))
+      || (!this.left && y_coor > 0 && (this.map.getType(x_coor, y_coor - 1) === "" || this.map.getType(x_coor, y_coor - 1) === "unit"))){
       facilities = this.facility_production_service.facilitiesDescription();
     }
     const resource_facilities = this.resource_facility_production_service.resourceFacilitiesDescription();
@@ -125,16 +126,32 @@ export class GameObjectService {
     }
   }
 
-  //Treba mi SignalR za to
-  //Treba da resetuje za sve jedinice finish_turn
-  nextTurn(){
-
+  //Postavlja ime trenutnog playera
+  nextTurn(player: string, left: boolean){
+    this.player = player;
+    this.left = left;
   }
 
   //Nesto kao first turn
   //Treba da napravi city
-  initialize(){
+  createGame(): {first_player: string, first_city: City, second_player: string, second_city: City}{
+    //first player
+    this.map.setType(12, 2, "city");
+    this.map.setOwner(12, 2, this.players[0]);
+    const first_city = new City(12, 2);
+    this.player = this.players[0];
 
+    //second player
+    this.map.setType(12, 22, "city");
+    this.map.setOwner(12, 22, this.players[1]);
+    const second_city = new City(12, 22);
+
+    return {first_player: this.players[0], first_city, second_player: this.players[1], second_city}
+  }
+
+  //Ovako se igrac prijavljuje u game
+  addPlayer(player_name: string){
+    this.players.push(player_name);
   }
 
   //Koji svi upgradovi mogu da se izuce
