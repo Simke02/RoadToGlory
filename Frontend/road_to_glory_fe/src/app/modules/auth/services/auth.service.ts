@@ -10,7 +10,7 @@ export class AuthService {
     constructor(private http: HttpClient) {}
 
     auth(user: { username: string; password: string }): Observable<UserInfo> {
-        return this.http.post<UserInfo>(`${environment.baseApiUrl}/auth/auth`, user);
+        return this.http.post<UserInfo>(`${environment.baseApiUrl}/auth/auth`, user,{withCredentials:true});
     }
     
     signup(user: {
@@ -21,5 +21,10 @@ export class AuthService {
       }) {
         console.log('sad ce da se pozove kontroler');
         return this.http.post(environment.baseApiUrl + '/auth', user);
-      }
+    }
+
+    
+    getUserInfo(): Observable<UserInfo> {
+      return this.http.get<UserInfo>(environment.baseApiUrl + '/auth/me');
+    }
 }

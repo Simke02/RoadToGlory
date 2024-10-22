@@ -20,9 +20,9 @@ export class UserService {
     }
 
 
-    findUserByUsername(username: string, relations?: FindOptionsRelations<User>) {
+    findUserByUsername(username: string) {
         try {
-            return this.userRepository.findOne({ where: { username }, relations });
+            return this.userRepository.findOne({ where: { username }});
         } 
         catch (err) {
             throw new UnhandledException(err);

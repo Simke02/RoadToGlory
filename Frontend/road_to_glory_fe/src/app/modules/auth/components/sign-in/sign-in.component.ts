@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { CurrentUserService } from '../../services/current_user.service';
 
 @Component({
   selector: 'app-sign-in',
@@ -13,7 +14,8 @@ export class SignInComponent {
 
   constructor(
     private auth_service: AuthService,
-    private router: Router
+    private router: Router,
+    private current_user_service:CurrentUserService
   ) {    
       this.signin_form = new FormGroup({
       username: new FormControl(null, [Validators.required]),
@@ -35,12 +37,13 @@ export class SignInComponent {
       next:res=>{
         console.log(res);
         localStorage.setItem("username", res.username);
+        this.router.navigate(['/lobby'])
+        this.current_user_service.addCurrentUser(res);
       }
     })
-    this.router.navigate(['/lobby'])
   }
 
   navigateToSignup() {
-    this.router.navigate(['/singup']);
+    this.router.navigate(['/signup']);
   }
 }

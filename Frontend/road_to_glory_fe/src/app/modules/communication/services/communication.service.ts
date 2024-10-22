@@ -22,46 +22,46 @@ export class CommunicationService {
     this.socket.emit('newMessage', { message});
   }
 
-  joinRoom(room: string): void {
-    this.socket.emit('joinRoom', {"room":room});
+  joinRoom(): void {
+    this.socket.emit('joinRoom');
   }
 
-  leaveRoom(): void{
-    this.socket.emit('leaveRoom');
+  leaveRoom(room: string): void{
+    this.socket.emit('leaveRoom', {"room":room});
   }
 
-  sendAttack(attack: AttackDto): void{
-    this.socket.emit('attack', {"attackDto": attack});
+  sendAttack(room: string, attack: AttackDto): void{
+    this.socket.emit('attack', {"room": room, "attackDto": attack});
   }
 
   sendDestroy(destroy: DestroyDto): void{
     this.socket.emit('destroy', {'destroyDto': destroy});
   }
 
-  sendMove(unit: Unit):void{
-    this.socket.emit('move', {"unit": unit});
+  sendMove(room: string, unit: Unit):void{
+    this.socket.emit('move', {"room": room, "unit": unit});
   }
 
-  sendProduceUnit(unit:Unit):void{
-    this.socket.emit('produceUnit', {'unit': unit});
+  sendProduceUnit(room: string, unit:Unit):void{
+    this.socket.emit('produceUnit', {"room": room, 'unit': unit});
   }
 
-  sendProduceFacility(facility:BasicFacility): void{
-    this.socket.emit('produceFacility', {'facility': facility});
+  sendProduceFacility(room: string, facility:BasicFacility): void{
+    this.socket.emit('produceFacility', {"room": room, 'facility': facility});
   }
 
-  sendNextTurn():void{
-    this.socket.emit('nextTurn');
+  sendNextTurn(room: string):void{
+    this.socket.emit('nextTurn', {'room': room});
   }
 
-  sendEndGame(winner: string): void{
-    this.socket.emit('endGame', {'winner': winner});
+  sendEndGame(room: string, winner: string): void{
+    this.socket.emit('endGame', {"room": room, 'winner': winner});
   }
 
   //observeri za poruke
-  getMessage(): Observable<any> {
+  getCreateGame(): Observable<any> {
     return new Observable(observer => {
-      this.socket.on('onMessage', (data: any) => {
+      this.socket.on('oncreateGame', (data: any) => {
         observer.next(data);
       });
     });
@@ -69,8 +69,8 @@ export class CommunicationService {
 
   getJoin(): Observable<any>{
     return new Observable(observer=>{
-      const listener = (message:string)=>{
-        observer.next(message);
+      const listener = (room: string)=>{
+        observer.next(room);
       };
       this.socket.on('onJoin', listener);
       
