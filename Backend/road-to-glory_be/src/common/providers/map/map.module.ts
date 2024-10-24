@@ -1,15 +1,16 @@
 import { Global, Module } from "@nestjs/common";
 import { Map } from "./map";
+import { Maps } from "./maps";
 
 @Global()
 @Module({
     providers: [
         {
-            provide: 'MAP',
-            useClass: Map,
+            provide: 'MAPS',
+            useClass: Maps,
         },
     ],
-    exports: ['MAP'],
+    exports: ['MAPS'],
 })
 
 export class MapModule {}

@@ -34,16 +34,16 @@ export class CommunicationService {
     this.socket.emit('attack', {"room": room, "attackDto": attack});
   }
 
-  sendDestroy(destroy: DestroyDto): void{
-    this.socket.emit('destroy', {'destroyDto': destroy});
+  sendDestroy(room: string, destroy: DestroyDto): void{
+    this.socket.emit('destroy', {"room": room, 'destroyDto': destroy});
   }
 
   sendMove(room: string, unit: Unit):void{
     this.socket.emit('move', {"room": room, "unit": unit});
+  }
 
   sendDestroyCity(room: string, destroy_city: DestroyDto): void{
     this.socket.emit('destroyCity', {'room': room, 'destroyDto': destroy_city});
-  }
   }
 
   sendProduceUnit(room: string, unit:Unit):void{

@@ -2,13 +2,13 @@ import { Inject } from "@nestjs/common";
 import { Farm } from "src/common/models/resource_facility/farm.model";
 import { Mine } from "src/common/models/resource_facility/mine.model";
 import { ResourceFacility } from "src/common/models/resource_facility/resource_facility.model";
-import { Map } from 'src/common/providers/map/map';
+import { Maps } from "src/common/providers/map/maps";
 
 export class ResourceFacilityProductionFactory{
     resource_facility_name: string[];
     gold_cost: number[];
 
-    constructor(@Inject('MAP') private readonly map: Map) {
+    constructor(@Inject('MAPS') private readonly maps: Maps) {
         this.resource_facility_name = [];
         this.resource_facility_name.push("r-farm");
         this.resource_facility_name.push("r-mine");
@@ -19,7 +19,7 @@ export class ResourceFacilityProductionFactory{
     }
 
     //Proizvodnja objekta za proizvodnju
-    produceResourceFacility(what_facility: string, x_coor: number, y_coor: number, player: string): ResourceFacility{
+    produceResourceFacility(what_facility: string, x_coor: number, y_coor: number, player: string, room: string): ResourceFacility{
         let resource_facility: ResourceFacility;
 
         switch(what_facility) {
@@ -30,8 +30,8 @@ export class ResourceFacilityProductionFactory{
                 resource_facility = new Mine(x_coor, y_coor);
                 break;
         }
-        this.map.setOwner(x_coor, y_coor, player);
-        this.map.setType(x_coor, y_coor, "resource");
+        this.maps.getMap(room).setOwner(x_coor, y_coor, player);
+        this.maps.getMap(room).setType(x_coor, y_coor, "resource");
 
         return resource_facility;
     }

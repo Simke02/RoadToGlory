@@ -23,6 +23,12 @@
     </div>
 </div>
 
+<div *ngIf="selected_menu" class="menu-container">
+  <app-selected-menu [health]="health"
+    (closeMenu)="closeSelectedMenu()">
+  </app-selected-menu>
+</div>
+
 <div *ngIf="buildings_menu" class="menu-container">
   <app-buildings-menu [buildings]="buildings"
     (closeMenu)="closeBuildingsMenu()" (optionSelected)="handleBuildingsMenu($event)">

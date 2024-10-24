@@ -42,6 +42,8 @@ export class GameComponent implements OnInit {
   production_menu: boolean = false;
   upgrades_menu: boolean = false;
   add_upgrades_menu: boolean = false;
+  selected_menu: boolean = false;
+  health: number = 0;
   buildings: BuildingsDto = {building_names: [], gold_cost: []};
   //production: ProductionDto = {iron_cost: [], grain_cost: [], unit_name: []};
   upgrades: UpgradesDto = {upgrade_name: [], gold_cost: []};
@@ -64,7 +66,8 @@ export class GameComponent implements OnInit {
     private game_service: GameService,
     private renderer: Renderer2,
     private el: ElementRef,
-    private current_user_service:CurrentUserService
+    private current_user_service:CurrentUserService,
+    private router: Router
   ) {
     const potential_room = sessionStorage.getItem("room_id");
     if(potential_room){
@@ -72,21 +75,13 @@ export class GameComponent implements OnInit {
     }
 
   }
-      
-      this.communication_service.getLeave()
-      .subscribe({
-        next:(message)=>{
-          console.log(message);
-          
-    private router: Router
-  ) {}
 
   ngOnInit(): void {
 
     this.player = sessionStorage.getItem('username')!;
 
     //Kreiranje igre
-    this.game_object_service.createGame()
+    this.game_object_service.createGame(this.room)
     .subscribe({
       next: (new_game) => {
         console.log(new_game);
@@ -105,7 +100,7 @@ export class GameComponent implements OnInit {
       }
     })
 
-    this.game_object_service.getTerrain().subscribe({
+    this.game_object_service.getTerrain(this.room).subscribe({
       next: (terrain) => {
         this.terrain = terrain;
 
@@ -128,7 +123,7 @@ export class GameComponent implements OnInit {
     .subscribe({
       next: (attack)=>{
         if(attack.attacker.health > 0){
-          if(attack.defender.health <= 0){
+          if(attack.defender.health <= 0 && attack.attacker.range == 1){
             const i = this.enemy_units.findIndex(unit => unit.id === attack.attacker.id);
             this.removeIconFromCell(this.enemy_units[i].x_coor, this.enemy_units[i].y_coor);
             this.displayIconAtCell(attack.attacker.x_coor, attack.attacker.y_coor, attack.attacker.icon, !this.left);
@@ -162,9 +157,11 @@ export class GameComponent implements OnInit {
           else if(this.game_service.isResourceFacility(destroy.object))
             this.player_resource_facilities.splice(this.player_resource_facilities.findIndex(facility => facility.x_coor === destroy.object.x_coor && facility.y_coor === destroy.object.y_coor), 1);
           
-          const i = this.enemy_units.findIndex(unit => unit.id === destroy.attacker.id);
-          this.removeIconFromCell(this.enemy_units[i].x_coor, this.enemy_units[i].y_coor);
-          this.displayIconAtCell(destroy.attacker.x_coor, destroy.attacker.y_coor, destroy.attacker.icon, !this.left);
+          if( destroy.attacker.range == 1) {
+            const i = this.enemy_units.findIndex(unit => unit.id === destroy.attacker.id);
+            this.removeIconFromCell(this.enemy_units[i].x_coor, this.enemy_units[i].y_coor);
+            this.displayIconAtCell(destroy.attacker.x_coor, destroy.attacker.y_coor, destroy.attacker.icon, !this.left);
+          }
         }
         else {
           if(this.game_service.isProductionFacility(destroy.object))
@@ -188,9 +185,11 @@ export class GameComponent implements OnInit {
           this.removeIconFromCell(destroy.object.x_coor, destroy.object.y_coor);
           this.player_city = { x_coor: -1, y_coor: -1, health: 0, icon: ""};
 
-          const i = this.enemy_units.findIndex(unit => unit.id === destroy.attacker.id);
-          this.removeIconFromCell(this.enemy_units[i].x_coor, this.enemy_units[i].y_coor);
-          this.displayIconAtCell(destroy.attacker.x_coor, destroy.attacker.y_coor, destroy.attacker.icon, !this.left);
+          if( destroy.attacker.range == 1) {
+            const i = this.enemy_units.findIndex(unit => unit.id === destroy.attacker.id);
+            this.removeIconFromCell(this.enemy_units[i].x_coor, this.enemy_units[i].y_coor);
+            this.displayIconAtCell(destroy.attacker.x_coor, destroy.attacker.y_coor, destroy.attacker.icon, !this.left);
+          }
         }
         else
           this.player_city = destroy.object;
@@ -244,7 +243,7 @@ export class GameComponent implements OnInit {
     .subscribe({
       next:()=>{
         //Moramo i serveru da posaljemo da je doslo do sledeceg poteza
-        this.game_object_service.nextTurn({player_name: this.player, left: this.left})
+        this.game_object_service.nextTurn({player_name: this.player, left: this.left, room: this.room})
         .subscribe({
           next: () => {
             this.my_turn = true;
@@ -268,7 +267,12 @@ export class GameComponent implements OnInit {
     .subscribe({
       next:(message)=>{
         sessionStorage.setItem('winner', message);
-        this.router.navigate(['/game_over']);
+        this.game_object_service.endGame(this.room)
+        .subscribe({
+          next: () => {
+            this.router.navigate(['/game_over']);
+          }
+        })
       }
     });
 
@@ -294,17 +298,17 @@ export class GameComponent implements OnInit {
       this.removeYellowBorder();
     }
 
+    if(this.possible_moves.length != 0){
+      this.removeRedBorders();
+    }
+
     this.selected_cell = {x_coor: row, y_coor: col};
     const cell = this.el.nativeElement.querySelector(`.row:nth-child(${row + 1}) .cell:nth-child(${col + 1})`);
     if (cell) {
       this.renderer.setStyle(cell, 'border-color', 'yellow');
     }
 
-    if(this.possible_moves.length != 0){
-      this.removeRedBorders();
-    }
-
-    this.game_object_service.getPosition(row, col)
+    this.game_object_service.getPosition(row, col, this.room)
         .subscribe({
             next: (position) => {
               
@@ -312,7 +316,7 @@ export class GameComponent implements OnInit {
 
               //Sta sve mozes da izgradis
               if(position.type === "" && ((this.left && col < this.terrain[0].length / 5) || (!this.left && col >= 4 * this.terrain[0].length / 5))){              
-                this.game_object_service.whatCanBeBuilt(row, col)
+                this.game_object_service.whatCanBeBuilt(row, col, this.room)
                 .subscribe({
                   next: (buildings) => {
                     buildings.gold_cost.unshift(this.gold);
@@ -329,7 +333,7 @@ export class GameComponent implements OnInit {
                 let unit = this.player_units.find(u => u.x_coor === row && u.y_coor === col);
           
                 if(unit && !unit.finished_turn){
-                  this.game_object_service.unitTurnPossibilities(unit)
+                  this.game_object_service.unitTurnPossibilities({unit, room: this.room})
                   .subscribe({
                       next: (position_step) => {
                         console.log(position_step);
@@ -340,12 +344,14 @@ export class GameComponent implements OnInit {
                             this.renderer.setStyle(cell, 'border-color', 'red');
                           }
                         });
-                        
                       }
                   })
 
                   if(unit.upgrade === "none")
                     this.add_upgrades_menu = true;
+
+                  this.health = unit.health;
+                  this.selected_menu = true;
 
                   this.selected_unit = unit;
                 }
@@ -361,6 +367,9 @@ export class GameComponent implements OnInit {
                           this.upgrades.gold_cost.push(upgrades.gold_cost[index]);
                         }
                       });
+                      this.health = this.player_city.health;
+                      this.selected_menu = true;
+
                       this.upgrades_menu = true;
                     }
                 })
@@ -375,15 +384,18 @@ export class GameComponent implements OnInit {
                   new_col++;
                 else
                   new_col--;
-                this.game_object_service.getPosition(row, new_col)
+                this.game_object_service.getPosition(row, new_col, this.room)
                 .subscribe({
                     next: (position) => {
                       if(position.type === ""){
                         this.production_menu = true;
                         this.selected_x = row;
                         this.selected_y = col;
-                        if(facility)
+                        if(facility){
                           this.selected_facility = facility;
+                          this.health = facility.health;
+                          this.selected_menu = true;
+                        }
                       }
                     }
                 })
@@ -406,11 +418,11 @@ export class GameComponent implements OnInit {
         const defender = this.enemy_units.find(d => d.x_coor === row && d.y_coor === col);
 
         if(defender){
-          this.game_object_service.attack({attacker: this.selected_unit, defender })
+          this.game_object_service.attack({attacker: this.selected_unit, defender, room: this.room })
           .subscribe({
             next: (attack) => {
               if(attack.attacker.health > 0){
-                if(attack.defender.health <= 0){
+                if(attack.defender.health <= 0  && attack.attacker.range == 1){
                   this.removeIconFromCell(this.selected_unit.x_coor, this.selected_unit.y_coor);
                   this.displayIconAtCell(attack.attacker.x_coor, attack.defender.y_coor, attack.attacker.icon, this.left);
                 }
@@ -434,7 +446,7 @@ export class GameComponent implements OnInit {
               this.removeRedBorders();
               this.removeYellowBorder();
 
-              this.communication_service.sendAttack(attack);
+              this.communication_service.sendAttack(this.room, attack);
             }
           })
         }
@@ -444,14 +456,16 @@ export class GameComponent implements OnInit {
         const object = this.enemy_facilities.find(f => f.x_coor === row && f.y_coor === col);
 
         if(object){
-          this.game_object_service.destroy({attacker: this.selected_unit, object})
+          this.game_object_service.destroy({attacker: this.selected_unit, object, room: this.room})
           .subscribe({
             next: (destroy) => {
               if(destroy.object.health <= 0){
                 this.removeIconFromCell(destroy.object.x_coor, destroy.object.y_coor);
                 this.enemy_facilities.splice(this.enemy_facilities.findIndex(facility => facility.x_coor === destroy.object.x_coor && facility.y_coor === destroy.object.y_coor), 1);
-                this.removeIconFromCell(this.selected_unit.x_coor, this.selected_unit.y_coor);
-                this.displayIconAtCell(destroy.attacker.x_coor, destroy.attacker.y_coor, destroy.attacker.icon, this.left);
+                if( destroy.attacker.range == 1) {
+                  this.removeIconFromCell(this.selected_unit.x_coor, this.selected_unit.y_coor);
+                  this.displayIconAtCell(destroy.attacker.x_coor, destroy.attacker.y_coor, destroy.attacker.icon, this.left);
+                }
               }
               else {
                 this.enemy_facilities[this.enemy_facilities.findIndex(facility => facility.x_coor === destroy.object.x_coor && facility.y_coor === destroy.object.y_coor)] = destroy.object;
@@ -465,21 +479,23 @@ export class GameComponent implements OnInit {
               console.log(this.enemy_facilities);
               console.log(this.player_units);
 
-              this.communication_service.sendDestroy(destroy);
+              this.communication_service.sendDestroy(this.room, destroy);
             }
           })
         }
       }
       //destroy city
       else if(move.type === "city"){
-        this.game_object_service.destroy({attacker: this.selected_unit, object: this.enemy_city})
+        this.game_object_service.destroy({attacker: this.selected_unit, object: this.enemy_city, room: this.room})
         .subscribe({
           next: (destroy) => {
             if(destroy.object.health <= 0){
               this.removeIconFromCell(destroy.object.x_coor, destroy.object.y_coor);
               this.enemy_city = { x_coor: -1, y_coor: -1, health: 0, icon: ""};
-              this.removeIconFromCell(this.selected_unit.x_coor, this.selected_unit.y_coor);
-              this.displayIconAtCell(destroy.attacker.x_coor, destroy.attacker.y_coor, destroy.attacker.icon, this.left);
+              if( destroy.attacker.range == 1) {
+                this.removeIconFromCell(this.selected_unit.x_coor, this.selected_unit.y_coor);
+                this.displayIconAtCell(destroy.attacker.x_coor, destroy.attacker.y_coor, destroy.attacker.icon, this.left);
+              }
             }
             else {
               this.enemy_city = destroy.object;
@@ -493,10 +509,10 @@ export class GameComponent implements OnInit {
             console.log(this.enemy_city);
             console.log(this.player_units);
 
-            this.communication_service.sendDestroyCity(destroy);
+            this.communication_service.sendDestroyCity(this.room, destroy);
 
             if(destroy.object.health <= 0){
-              this.communication_service.sendEndGame(this.player);
+              this.communication_service.sendEndGame(this.room, this.player);
               sessionStorage.setItem('winner', this.player);
               this.router.navigate(['/game_over']);
             }
@@ -505,7 +521,7 @@ export class GameComponent implements OnInit {
       }
       //move
       else if(move.type === ""){
-        this.game_object_service.move({unit: this.selected_unit, final_position: move})
+        this.game_object_service.move({unit: this.selected_unit, final_position: move, room: this.room})
         .subscribe({
           next: (unit) => {
             //1 Na osnovu id izbacis iz player_units taj unit i dodas ga opet
@@ -527,13 +543,14 @@ export class GameComponent implements OnInit {
           this.communication_service.sendMove(this.room.toString(), unit);
         }
       })
+      }
     }
   }
 
   //Odavde pozivas proizvodnju objekta i cuvas ga na odgovarajucem mestu
   handleBuildingsMenu(selected_option: {building_name: string, gold_cost: number}) {
     this.buildings_menu = false;
-    this.game_object_service.produceFacility(selected_option.building_name, this.selected_x, this.selected_y)
+    this.game_object_service.produceFacility(selected_option.building_name, this.selected_x, this.selected_y, this.room)
     .subscribe({
       next: (facility) => {
         if(this.game_service.isProductionFacility(facility))
@@ -558,7 +575,7 @@ export class GameComponent implements OnInit {
     this.selected_x = -1;
     this.selected_y = -1;
     this.buildings = {building_names: [], gold_cost: []};
-    this.removeYellowBorder();
+    //this.removeYellowBorder();
   }
 
   //Odavde pozivas proizvodnju jedinica i cuvas je na odgovarajucem mestu
@@ -568,7 +585,7 @@ export class GameComponent implements OnInit {
       new_y++;
     else
       new_y--;
-    this.game_object_service.produceUnit(selected_option.unit_type, selected_option.unit_name, this.selected_x, new_y)
+    this.game_object_service.produceUnit(selected_option.unit_type, selected_option.unit_name, this.selected_x, new_y, this.room)
     .subscribe({
       next: (unit) => {
         this.player_units.push(unit);
@@ -592,7 +609,7 @@ export class GameComponent implements OnInit {
     this.selected_x = -1;
     this.selected_y = -1;
     this.selected_facility = {x_coor: -1, y_coor: -1, health: 0, icon: "", iron_cost: [], grain_cost: [], unit_name: [], type: ""};
-    this.removeYellowBorder();
+    //this.removeYellowBorder();
   }
 
   //Odavde pozivas izucavanje upgrade i cuvas ga na odgovarajucem mestu
@@ -617,7 +634,7 @@ export class GameComponent implements OnInit {
     this.selected_x = -1;
     this.selected_y = -1;
     this.upgrades = {upgrade_name: [], gold_cost: []};
-    this.removeYellowBorder();
+    //this.removeYellowBorder();
   }
 
   //Odavde dodajes upgrade jedinici
@@ -638,7 +655,14 @@ export class GameComponent implements OnInit {
     this.add_upgrades_menu = false;
     this.selected_x = -1;
     this.selected_y = -1;
-    this.removeYellowBorder();
+    //this.removeYellowBorder();
+  }
+
+    //Odavde gasis meni za upgrades bez da bilo sta izaberes
+  closeSelectedMenu() {
+    this.selected_menu = false;
+    this.health = 0;
+    //this.removeYellowBorder();
   }
 
   displayIconAtCell(row: number, col: number, iconType: string, facing: boolean) {

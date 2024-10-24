@@ -1,7 +1,7 @@
 .matrix {
     display: flex;
     flex-direction: column; 
-    height: calc(100vh - 115px);/*100vh;*/
+    height: calc(100vh - 135px);/*100vh;*/
     width: calc(100vw - 15px);/*100vw;*/
     margin-bottom: 10px; /* Adds space at the bottom */
   }

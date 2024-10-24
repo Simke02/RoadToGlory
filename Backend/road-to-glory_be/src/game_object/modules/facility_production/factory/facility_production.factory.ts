@@ -3,13 +3,13 @@ import { ArtilleryPlant } from "src/common/models/facility/artillery_plant.model
 import { Barracks } from "src/common/models/facility/barracks.model";
 import { Facility } from "src/common/models/facility/facility.model";
 import { TankPlant } from "src/common/models/facility/tank_plant.model";
-import { Map } from 'src/common/providers/map/map';
+import { Maps } from "src/common/providers/map/maps";
 
 export class FacilityProductionFactory{
     facility_name: string[];
     gold_cost: number[];
 
-    constructor(@Inject('MAP') private readonly map: Map){
+    constructor(@Inject('MAPS') private readonly maps: Maps){
         this.facility_name = [];
         this.facility_name.push("p-barracks"); //Ovo p stavljamo da bi smo mogli da razlikujemo u funkciji produceFacility iz game_obj
         this.facility_name.push("p-tank_plant");
@@ -22,7 +22,7 @@ export class FacilityProductionFactory{
     }
 
     //Proizvodnja objekta za proizvodnju
-    produceFacility(what_facility: string, x_coor: number, y_coor, player: string): Facility{
+    produceFacility(what_facility: string, x_coor: number, y_coor, player: string, room: string): Facility{
         let facility: Facility;
 
         switch(what_facility) {
@@ -36,8 +36,8 @@ export class FacilityProductionFactory{
                 facility = new ArtilleryPlant(x_coor, y_coor);
                 break;
         }
-        this.map.setOwner(x_coor, y_coor, player);
-        this.map.setType(x_coor, y_coor, "facility");
+        this.maps.getMap(room).setOwner(x_coor, y_coor, player);
+        this.maps.getMap(room).setType(x_coor, y_coor, "facility");
 
         return facility;
     }

@@ -18,21 +18,19 @@ export class LobbyComponent implements OnInit {
   ){}
   
   ngOnInit(): void {
-
-    
-
-    this.communication_service.joinRoom();
-    //ovde ide ono za bazu sto smo pricali
-
-    const player = sessionStorage.getItem('username')!;
-    this.game_object_service.addPlayer(player)
-    .subscribe();    
+    this.communication_service.joinRoom(); 
 
     this.communication_service.getJoin()
       .subscribe({
         next:(room)=>{
-          sessionStorage.setItem("room_id", room);
-          this.router.navigate(['/game']);
+          const player = sessionStorage.getItem('username')!;
+          this.game_object_service.addPlayer({ player_name: player.toString(), room })
+          .subscribe({
+            next: () => {
+              sessionStorage.setItem("room_id", room);
+              this.router.navigate(['/game']);
+            }
+          });   
         }
       });
   }

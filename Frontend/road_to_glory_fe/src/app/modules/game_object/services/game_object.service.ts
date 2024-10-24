@@ -15,18 +15,20 @@ import { Position } from "src/app/common/models/position/position.model";
 import { Upgrade } from "src/app/common/models/upgrade/upgrade.model";
 import { CreateGameDto } from "src/app/common/models/dto/create_game.dto";
 import { NextTurnDto } from "src/app/common/models/dto/next_turn.dto";
+import { AddPlayerDto } from "src/app/common/models/dto/add_player.dto";
+import { UnitDto } from "src/app/common/models/dto/unit.dto";
 
 @Injectable()
 export class GameObjectService {
     
     constructor(private http: HttpClient) {}
     
-    whatCanBeBuilt(x_coor: number, y_coor: number): Observable<BuildingsDto> {
-        return this.http.get<BuildingsDto>(environment.baseApiUrl + `/game-object/whatCanBeBuilt/${x_coor}/${y_coor}`);
+    whatCanBeBuilt(x_coor: number, y_coor: number, room: string): Observable<BuildingsDto> {
+        return this.http.get<BuildingsDto>(environment.baseApiUrl + `/game-object/whatCanBeBuilt/${x_coor}/${y_coor}/${room}`);
     }
 
-    unitTurnPossibilities(unit: Unit): Observable<PositionStep[]> {
-        return this.http.post<PositionStep[]>(environment.baseApiUrl + `/game-object/unitTurnPossibilities`, unit);
+    unitTurnPossibilities(unitDto: UnitDto): Observable<PositionStep[]> {
+        return this.http.post<PositionStep[]>(environment.baseApiUrl + `/game-object/unitTurnPossibilities`, unitDto);
     }
 
     attack(attackDto: AttackDto): Observable<AttackDto>{
@@ -41,12 +43,12 @@ export class GameObjectService {
         return this.http.post<Unit>(environment.baseApiUrl + `/game-object/move`, moveDto);
     }
 
-    produceUnit(unit_type: string, unit_name: string, x_coor: number, y_coor: number): Observable<Unit> {
-        return this.http.get<Unit>(environment.baseApiUrl + `/game-object/produceUnit/${unit_type}/${unit_name}/${x_coor}/${y_coor}`);
+    produceUnit(unit_type: string, unit_name: string, x_coor: number, y_coor: number, room: string): Observable<Unit> {
+        return this.http.get<Unit>(environment.baseApiUrl + `/game-object/produceUnit/${unit_type}/${unit_name}/${x_coor}/${y_coor}/${room}`);
     }
 
-    produceFacility(facility_id: string, x_coor: number, y_coor: number): Observable<BasicFacility> {
-        return this.http.get<BasicFacility>(environment.baseApiUrl + `/game-object/produceFacility/${facility_id}/${x_coor}/${y_coor}`);
+    produceFacility(facility_id: string, x_coor: number, y_coor: number, room: string): Observable<BasicFacility> {
+        return this.http.get<BasicFacility>(environment.baseApiUrl + `/game-object/produceFacility/${facility_id}/${x_coor}/${y_coor}/${room}`);
     }
 
     whatUpgradesExist(): Observable<UpgradesDto> {
@@ -57,23 +59,27 @@ export class GameObjectService {
         return this.http.get<Upgrade>(environment.baseApiUrl + `/game-object/researchUpgrade/${what_upgrade}`);
     }
 
-    getTerrain(): Observable<string[][]> {
-        return this.http.get<string[][]>(environment.baseApiUrl + `/game-object/getTerrain`);
+    getTerrain(room: string): Observable<string[][]> {
+        return this.http.get<string[][]>(environment.baseApiUrl + `/game-object/getTerrain/${room}`);
     }
 
-    getPosition(x_coor: number, y_coor: number): Observable<Position> {
-        return this.http.get<Position>(environment.baseApiUrl + `/game-object/getPosition/${x_coor}/${y_coor}`);
+    getPosition(x_coor: number, y_coor: number, room: string): Observable<Position> {
+        return this.http.get<Position>(environment.baseApiUrl + `/game-object/getPosition/${x_coor}/${y_coor}/${room}`);
     }
 
-    addPlayer(player_name: string): Observable<void> {
-        return this.http.post<void>(environment.baseApiUrl + `/game-object/addPlayer`, { player_name });
+    addPlayer(addPlayerDto: AddPlayerDto): Observable<void> {
+        return this.http.post<void>(environment.baseApiUrl + `/game-object/addPlayer`, addPlayerDto);
     }
 
-    createGame(): Observable<CreateGameDto> {
-        return this.http.get<CreateGameDto>(environment.baseApiUrl + `/game-object/createGame`);
+    createGame(room: string): Observable<CreateGameDto> {
+        return this.http.get<CreateGameDto>(environment.baseApiUrl + `/game-object/createGame/${room}`);
     }
 
     nextTurn(nextTurnDto: NextTurnDto): Observable<void> {
         return this.http.post<void>(environment.baseApiUrl + `/game-object/nextTurn`, nextTurnDto);
+    }
+
+    endGame(room: string): Observable<void> {
+        return this.http.post<void>(environment.baseApiUrl + `/game-object/endGame`, {room});
     }
 }

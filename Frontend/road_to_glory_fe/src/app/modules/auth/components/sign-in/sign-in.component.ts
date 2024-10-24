@@ -33,8 +33,7 @@ export class SignInComponent {
       password
     }).subscribe({
       next:res=>{
-        console.log(res);
-        localStorage.setItem("username", res.username);
+        sessionStorage.setItem("username", res.username);
         this.router.navigate(['/lobby'])
         this.current_user_service.addCurrentUser(res);
       }

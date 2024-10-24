@@ -5,4 +5,5 @@ export interface PositionStep {
     owner: string;
     type: string;
     steps_left: number;
+    steps: number;
 }

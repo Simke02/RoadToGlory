@@ -12,6 +12,7 @@ import { getUserInfoInitializer } from '../initializer/get_user_info.initializer
 import { CurrentUserService } from '../auth/services/current_user.service';
 import { AuthService } from '../auth/services/auth.service';
 import { GameOverComponent } from './components/game_over/game_over.component';
+import { SelectedMenuComponent } from './components/selected_menu/selected_menu.component';
 
 
 
@@ -23,7 +24,8 @@ import { GameOverComponent } from './components/game_over/game_over.component';
     ProductionMenuComponent,
     LobbyComponent,
     AddUpgradeMenuComponent,
-    GameOverComponent
+    GameOverComponent,
+    SelectedMenuComponent
   ],
   imports: [
     CommonModule

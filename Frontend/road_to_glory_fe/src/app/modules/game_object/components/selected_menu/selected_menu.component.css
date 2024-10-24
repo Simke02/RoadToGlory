@@ -1,0 +1,17 @@
+.header {
+    display: flex;
+    justify-content: space-between; /* Distribute space evenly between items */
+    padding: 2px;
+    background-color: #f0f0f0; /* Optional background color */
+    border-bottom: 1px solid #ccc; /* Optional border to separate the header */
+}
+
+.info {
+    flex: 1; /* Make all resource divs the same width */
+    text-align: center; /* Center the text */
+    font-weight: bold;
+}
+
+.info p {
+    margin: 0; /* Remove default margin from paragraphs */
+}
