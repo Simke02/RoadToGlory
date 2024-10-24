@@ -33,12 +33,12 @@ import { SelectedMenuComponent } from './components/selected_menu/selected_menu.
   providers: [
     GameObjectService,
     GameService,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: getUserInfoInitializer,
-      deps: [AuthService, CurrentUserService],
-      multi: true,
-    },
+    // {
+    //   provide: APP_INITIALIZER,
+    //   useFactory: getUserInfoInitializer,
+    //   deps: [AuthService, CurrentUserService],
+    //   multi: true,
+    // },
   ]
 })
 export class GameObjectModule { }

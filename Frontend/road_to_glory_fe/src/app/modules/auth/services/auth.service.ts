@@ -1,16 +1,19 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
+import { BehaviorSubject, Observable } from "rxjs";
 import { environment } from "src/app/common/environment";
+import { AuthDto } from "src/app/common/models/dto/auth.dto";
 import { UserInfo } from "src/app/common/models/dto/user_info.dto";
 
 @Injectable()
 export class AuthService {
 
+  logged_in= new BehaviorSubject<boolean>(false);
+
     constructor(private http: HttpClient) {}
 
-    auth(user: { username: string; password: string }): Observable<UserInfo> {
-        return this.http.post<UserInfo>(`${environment.baseApiUrl}/auth/auth`, user,{withCredentials:true});
+    auth(user: { username: string; password: string }): Observable<AuthDto> {
+        return this.http.post<AuthDto>(`${environment.baseApiUrl}/auth/auth`, user);
     }
     
     signup(user: {
@@ -21,7 +24,17 @@ export class AuthService {
       }) {
         return this.http.post(environment.baseApiUrl + '/auth', user);
     }
+
+
     getUserInfo(): Observable<UserInfo> {
-      return this.http.get<UserInfo>(environment.baseApiUrl + '/auth/me');
+      const local_token = localStorage.getItem('token');
+      let token='';
+      if(local_token){
+        token = JSON.parse(local_token).toString()
+      }
+      const httpOptions = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer' + token)
+      };
+      return this.http.get<UserInfo>(environment.baseApiUrl + '/auth/me', httpOptions);
     }
 }

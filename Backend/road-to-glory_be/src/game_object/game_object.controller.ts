@@ -21,7 +21,7 @@ export class GameObjectController {
 
   //Probaj kada postoji nesto iza
   @Get('whatCanBeBuilt/:x_coor/:y_coor/:room')
-  //@UseGuards(JwtGuard)
+  @UseGuards(JwtGuard)
   whatCanBeBuilt(
     @Param('x_coor') x_coor: string,
     @Param('y_coor') y_coor: string,
@@ -33,14 +33,14 @@ export class GameObjectController {
 
   //Probaj kada postoje neki objekti i jedinice
   @Post('unitTurnPossibilities')
-  //@UseGuards(JwtGuard)
+  @UseGuards(JwtGuard)
   unitTurnPossibilities(
     @Body() unitDto: UnitDto) {
       return this.gameObjectService.unitTurnPossibilities(unitDto.unit, unitDto.room);
   }
 
   @Post('attack')
-  //@UseGuards(JwtGuard)
+  @UseGuards(JwtGuard)
   attack(
     @Body() attackDto: AttackDto) {
       const {attacker, defender, room} = attackDto;
@@ -48,7 +48,7 @@ export class GameObjectController {
   }
 
   @Post('destroy')
-  //@UseGuards(JwtGuard)
+  @UseGuards(JwtGuard)
   destroy(
     @Body() destroyDto: DestroyDto) {
       const {attacker, object, room} = destroyDto;
@@ -56,7 +56,7 @@ export class GameObjectController {
   }
 
   @Post('move')
-  //@UseGuards(JwtGuard)
+  @UseGuards(JwtGuard)
   move(
     @Body() moveDto: MoveDto) {
       const {unit, final_position, room} = moveDto;
@@ -64,7 +64,7 @@ export class GameObjectController {
   }
 
   @Get('produceUnit/:unit_type/:unit_name/:x_coor/:y_coor/:room')
-  //@UseGuards(JwtGuard)
+  @UseGuards(JwtGuard)
   produceUnit(
     @Param('unit_type') unit_type: string,
     @Param('unit_name') unit_name: string,
@@ -78,7 +78,7 @@ export class GameObjectController {
 
   //NISAM PROBAO
   @Get('produceFacility/:facility_id/:x_coor/:y_coor/:room')
-  //@UseGuards(JwtGuard)
+  @UseGuards(JwtGuard)
   produceFacility(
     @Param('facility_id') facility_id: string,
     @Param('x_coor') x_coor: string,
@@ -90,25 +90,25 @@ export class GameObjectController {
   }
 
   @Get('whatUpgrades')
-  //@UseGuards(JwtGuard)
+  @UseGuards(JwtGuard)
   whatUpgradesExist(){
     return this.gameObjectService.whatUpgradesExist();
   }
 
   @Get('researchUpgrade/:what_upgrade')
-  //@UseGuards(JwtGuard)
+  @UseGuards(JwtGuard)
   researchUpgrade(@Param('what_upgrade') what_upgrade: string) {
     return this.gameObjectService.researchUpgrade(what_upgrade);
   }
 
   @Get('getTerrain/:room')
-  //@UseGuards(JwtGuard)
+  @UseGuards(JwtGuard)
   getTerrain(@Param('room') room: string) {
     return this.gameObjectService.getTerrain(room);
   }
 
   @Get('getPosition/:x_coor/:y_coor/:room')
-  //@UseGuards(JwtGuard)
+  @UseGuards(JwtGuard)
   getPosition(
     @Param('x_coor') x_coor: string,
     @Param('y_coor') y_coor: string,
@@ -119,7 +119,7 @@ export class GameObjectController {
   }
 
   @Post('addPlayer')
-  //@UseGuards(JwtGuard)
+  @UseGuards(JwtGuard)
   addPlayer(
     @Body() addPlayerDto: AddPlayerDto) {
       return this.gameObjectService.addPlayer(addPlayerDto.player_name, addPlayerDto.room);
@@ -131,7 +131,7 @@ export class GameObjectController {
   }
 
   @Post('nextTurn')
-  //@UseGuards(JwtGuard)
+  @UseGuards(JwtGuard)
   nextTurn(
     @Body() nextTurnDto: NextTurnDto) {
       return this.gameObjectService.nextTurn(nextTurnDto.player_name, nextTurnDto.left, nextTurnDto.room);
