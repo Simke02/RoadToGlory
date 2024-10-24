@@ -5,13 +5,38 @@ import { SignUpComponent } from './modules/auth/components/sign_up/sign_up.compo
 import { SignInComponent } from './modules/auth/components/sign-in/sign-in.component';
 import { LobbyComponent } from './modules/game_object/components/lobby/lobby.component';
 import { GameOverComponent } from './modules/game_object/components/game_over/game_over.component';
+import { AuthGuard } from './modules/auth/guards/auth1.guard';
+import { authGuard } from './modules/auth/guards/auth.guard';
+import { PlayingGuard } from './modules/auth/guards/playing.guard';
 
 const routes: Routes = [
-  {path: '', component: SignInComponent },
-  {path: 'game', component: GameComponent},
-  {path: 'signup', component: SignUpComponent },
-  {path: 'lobby', component: LobbyComponent},
-  {path: 'game_over', component: GameOverComponent}
+  {
+    path: '', 
+    component: SignInComponent 
+  },
+  
+  {
+    path: 'game', 
+    component: GameComponent,
+    canActivate:[AuthGuard, PlayingGuard]
+  },
+  
+  {
+    path: 'signup', 
+    component: SignUpComponent
+  },
+  
+  {
+    path: 'lobby', 
+    component: LobbyComponent,
+    canActivate: [AuthGuard]
+  },
+  
+  {
+    path: 'game_over', 
+    component: GameOverComponent,
+    canActivate: [AuthGuard]
+  }
 ];
 
 @NgModule({

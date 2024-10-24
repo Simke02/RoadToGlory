@@ -19,6 +19,8 @@
         </div>
     
         <button mat-button color="primary" [disabled]="!this.signin_form.valid">Sign in</button>
+
+        <p class="error-message" *ngIf="loginError">{{loginError}}</p>
         
         <p class="signup-link" (click)="navigateToSignup()">Don't have an account? Sign up here.</p>
       </div>

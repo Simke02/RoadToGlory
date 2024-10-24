@@ -82,3 +82,10 @@
     color: #0056b3;
   }
   
+  .error-message {
+    color: red;
+    font-weight: bold;
+    margin-top: 10px;
+    font-size: 1.1rem;
+    text-align: center;
+  }

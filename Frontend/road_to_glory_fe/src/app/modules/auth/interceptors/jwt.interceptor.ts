@@ -7,23 +7,21 @@ import {
 } from "@angular/common/http";
 import { catchError, Observable, throwError } from "rxjs";
 import { Router } from "@angular/router";
+import { AuthService } from "../services/auth.service";
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
-  constructor(private router: Router) {}
-
-  intercept(
-    request: HttpRequest<unknown>,
-    next: HttpHandler,
-  ): Observable<HttpEvent<unknown>> {
-    request = request.clone({ withCredentials: true });
-    return next.handle(request).pipe(
-      catchError((error) => {
-        if (error.status === 401 && !request.url.includes("/auth/me")) {
-          this.router.navigate(["/login"]);
-        }
-        return throwError(() => error);
-      }),
-    );
+  constructor(private auth_service:AuthService){}
+  
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+     const token = sessionStorage.getItem('token')
+     if(!token){
+      return next.handle(req);
+     }
+     const modefiedReq = req.clone({
+      setHeaders:{Authorization: `bearer ${token}`}
+    })
+    return next.handle(modefiedReq);
+    
   }
 }

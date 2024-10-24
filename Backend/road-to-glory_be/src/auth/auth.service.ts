@@ -8,6 +8,7 @@ import { PasswordNotValidException } from 'src/common/exceptions/password-not-va
 import { User } from 'src/common/models/user/user.entity';
 import * as bcrypt from "bcrypt";
 import { MeUserInfoDto } from 'src/common/models/user/dto/me-user-info.dto';
+import { access } from 'fs';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +19,7 @@ export class AuthService {
     private jwtService: JwtService,
   ){}
 
-  async auth(username: string, password: string): Promise<[MeUserInfoDto, string]> {
+  async auth(username: string, password: string): Promise<MeUserInfoDto> {
     const potentialUser = await this.userService.findUserByUsername(username);
     if(!potentialUser){
       throw new UserNotFoundException();
@@ -30,13 +31,18 @@ export class AuthService {
     if (!isPasswordMatch) {
       throw new PasswordNotValidException();
     }
-    return[
-      this.classMapper.map(potentialUser, User, MeUserInfoDto),
-      this.jwtService.sign({
-        username:potentialUser.username
-      }),
-    ]
+    return this.classMapper.map(potentialUser, User, MeUserInfoDto)
+
   }
+
+  async login(user:any){
+
+    return this.jwtService.sign({
+        username: user.username
+      });
+    
+  }
+
 
   
 

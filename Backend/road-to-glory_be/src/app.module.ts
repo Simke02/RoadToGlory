@@ -36,7 +36,6 @@ import { config } from './common/environment/orm.config';
     useFactory: (config: ConfigService) => {
       return {
         secret: config.get("jwtSecret"),
-        signOptions: { expiresIn: "3600s" },
       };
     },
     global: true,

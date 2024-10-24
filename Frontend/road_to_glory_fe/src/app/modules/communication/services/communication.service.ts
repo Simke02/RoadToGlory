@@ -40,10 +40,10 @@ export class CommunicationService {
 
   sendMove(room: string, unit: Unit):void{
     this.socket.emit('move', {"room": room, "unit": unit});
+  }
 
   sendDestroyCity(room: string, destroy_city: DestroyDto): void{
     this.socket.emit('destroyCity', {'room': room, 'destroyDto': destroy_city});
-  }
   }
 
   sendProduceUnit(room: string, unit:Unit):void{

@@ -12,10 +12,7 @@ import { Configuration } from "src/persistence/configuration/model/configuration
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private configService: ConfigService<Configuration>) {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        JwtStrategy.getJwt,
-        ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ]),
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: configService.get("jwtSecret"),
     });

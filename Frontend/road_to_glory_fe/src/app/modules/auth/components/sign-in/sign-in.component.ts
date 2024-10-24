@@ -11,6 +11,7 @@ import { CurrentUserService } from '../../services/current_user.service';
 })
 export class SignInComponent {
   signin_form: FormGroup;
+  loginError: string="";
 
   constructor(
     private auth_service: AuthService,
@@ -33,11 +34,29 @@ export class SignInComponent {
       password
     }).subscribe({
       next:res=>{
-        console.log(res);
-        localStorage.setItem("username", res.username);
+        
+        sessionStorage.setItem('username', res.me.username);
+        sessionStorage.setItem('token', res.token);
+        
+        this.auth_service.logged_in.next(true);
+          
         this.router.navigate(['/lobby'])
-        this.current_user_service.addCurrentUser(res);
+        //this.current_user_service.addCurrentUser(res.me);
+      },
+      error: err=>{
+        if (err.status === 404) {
+          // Korisnik ne postoji
+          this.loginError = 'Username does not exist. Please try again.';
+        } else if (err.status === 406) {
+          // Neispravna lozinka
+          this.loginError = 'Wrong password. Try again!';
+        } else {
+          // Opšta greška
+          this.loginError = 'An error occurred. Please try again later.';
+        }
       }
+      
+      
     })
   }
 
