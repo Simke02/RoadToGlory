@@ -41,17 +41,21 @@ export class AuthController {
   @UseFilters(UserNotFoundExceptionFilter)
   @UseFilters(PasswordNotValidExceptionFilter)
   async auth(@Body() authDto: AuthDto, @Res() res: Response){
-    const [me, token] = await this.authService.auth(
+    const me = await this.authService.auth(
       authDto.username,
       authDto.password
     );
-    res.cookie(AUTHORIZATION_HEADER, token, {httpOnly: true});
-    res.send(me);
+    const token = await this.authService.login(me)
+    //res.cookie(AUTHORIZATION_HEADER, token, {httpOnly: true})
+    res.send({me, token});
   }
 
+  //treba da se doradi
   @Get("me")
   @UseGuards(JwtGuard)
   async getUserInfo(@Res() res: Response, @Req() req: Request) {
+    // const authHeader = req.headers['authorization'];
+    // const token = authHeader.split(' ')[1];
     const user = await this.userService.findUserByUsername(
       this.jwtService.decode(req.cookies[AUTHORIZATION_HEADER])["username"]
     );

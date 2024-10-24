@@ -9,7 +9,10 @@ export function getUserInfoInitializer(
 ): () => Observable<UserInfo> {
   return () =>
     authService.getUserInfo().pipe(
-      tap((response) => currentUserService.addCurrentUser(response)),
+      tap((response) => {
+        console.log(response);
+        currentUserService.addCurrentUser(response)
+      }),
       catchError((err) => of(err)),
     );
 }

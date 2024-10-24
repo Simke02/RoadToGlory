@@ -31,12 +31,12 @@ import { GameOverComponent } from './components/game_over/game_over.component';
   providers: [
     GameObjectService,
     GameService,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: getUserInfoInitializer,
-      deps: [AuthService, CurrentUserService],
-      multi: true,
-    },
+    // {
+    //   provide: APP_INITIALIZER,
+    //   useFactory: getUserInfoInitializer,
+    //   deps: [AuthService, CurrentUserService],
+    //   multi: true,
+    // },
   ]
 })
 export class GameObjectModule { }

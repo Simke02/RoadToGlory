@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, Renderer2 } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 import { GameObjectService } from '../../services/game_object.service';
 import { CommunicationService } from 'src/app/modules/communication/services/communication.service';
 import { GameService } from '../../services/game.service';
@@ -13,7 +13,7 @@ import { UpgradesDto } from 'src/app/common/models/dto/upgrades.dto';
 import { ProductionDto } from 'src/app/common/models/dto/production.dto';
 import { Upgrade } from 'src/app/common/models/upgrade/upgrade.model';
 import { CurrentUserService } from 'src/app/modules/auth/services/current_user.service';
-import { map } from 'rxjs';
+import { map, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/modules/auth/services/auth.service';
 import { City } from 'src/app/common/models/city/city.model';
@@ -23,7 +23,7 @@ import { City } from 'src/app/common/models/city/city.model';
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.css']
 })
-export class GameComponent implements OnInit {
+export class GameComponent implements OnInit, OnDestroy {
   private player: string="";
   private room:string="0";
   private left: boolean = true;
@@ -53,37 +53,51 @@ export class GameComponent implements OnInit {
   private selected_unit: Unit = {id: 0, x_coor: -1, y_coor: -1, health: 0, strenght: 0, range: 0, steps: 0, steps_left: 0, upgrade: "", finished_turn: true, icon: ""};
   private selected_cell: {x_coor: number, y_coor: number} = {x_coor: -1, y_coor: -1};
 
-  authenticated$ = this.current_user_service
-    .getCurrentUser$()
-    .pipe(map((user) => !!user));
+  logged_in: boolean = false;
+  logged_in_sub: Subscription;
+
+  // authenticated$ = this.current_user_service
+  //   .getCurrentUser$()
+  //   .pipe(map((user) => !!user));
 
 
   constructor(
     private game_object_service: GameObjectService,
     private communication_service: CommunicationService,
+    private auth_service: AuthService,
     private game_service: GameService,
     private renderer: Renderer2,
     private el: ElementRef,
-    private current_user_service:CurrentUserService
+    private current_user_service:CurrentUserService,
+    private router: Router
   ) {
+
     const potential_room = sessionStorage.getItem("room_id");
     if(potential_room){
       this.room = JSON.parse(potential_room).toString();
     }
 
+    this.logged_in_sub = this.auth_service.logged_in.subscribe({
+      next:(logged)=>{
+        this.logged_in = logged;
+      }
+    })
+
   }
-      
-      this.communication_service.getLeave()
-      .subscribe({
-        next:(message)=>{
-          console.log(message);
           
-    private router: Router
-  ) {}
 
   ngOnInit(): void {
+    window.addEventListener('beforeunload', this.unloadNotification);
 
     this.player = sessionStorage.getItem('username')!;
+
+    const token = sessionStorage.getItem('token');
+    
+    if(token){
+      this.auth_service.logged_in.next(true);
+    }
+    else
+      this.auth_service.logged_in.next(false);
 
     //Kreiranje igre
     this.game_object_service.createGame()
@@ -119,6 +133,7 @@ export class GameComponent implements OnInit {
     this.communication_service.getLeave()
     .subscribe({
       next:(message)=>{
+        //ovde mozda da se pozove funkcija da se proosledi winner 
         console.log(message);
       }
     });
@@ -272,6 +287,10 @@ export class GameComponent implements OnInit {
       }
     });
 
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('beforeunload', this.unloadNotification);
   }
 
   getColor(value: string): string {
@@ -434,7 +453,7 @@ export class GameComponent implements OnInit {
               this.removeRedBorders();
               this.removeYellowBorder();
 
-              this.communication_service.sendAttack(attack);
+              this.communication_service.sendAttack(this.room, attack);
             }
           })
         }
@@ -493,10 +512,10 @@ export class GameComponent implements OnInit {
             console.log(this.enemy_city);
             console.log(this.player_units);
 
-            this.communication_service.sendDestroyCity(destroy);
+            this.communication_service.sendDestroyCity(this.room, destroy);
 
             if(destroy.object.health <= 0){
-              this.communication_service.sendEndGame(this.player);
+              this.communication_service.sendEndGame(this.room, this.player);
               sessionStorage.setItem('winner', this.player);
               this.router.navigate(['/game_over']);
             }
@@ -528,7 +547,7 @@ export class GameComponent implements OnInit {
         }
       })
     }
-  }
+  }}
 
   //Odavde pozivas proizvodnju objekta i cuvas ga na odgovarajucem mestu
   handleBuildingsMenu(selected_option: {building_name: string, gold_cost: number}) {
@@ -700,5 +719,18 @@ export class GameComponent implements OnInit {
 
     //4 sklonimo selected_cell
     this.selected_cell = {x_coor: -1, y_coor: -1};
+  }
+
+  unloadNotification(event: BeforeUnloadEvent): void {
+    sessionStorage.removeItem('room_id');
+
+    
+    //Posalji da je drugi pobedio
+    
+    const confirmationMessage = 'Are you sure you want to leave? Changes you made may not be saved.';
+    this.communication_service.leaveRoom(this.room);
+    
+    // Standard way to prompt for beforeunload
+    event.returnValue = confirmationMessage; // Chrome requires this to be set
   }
 }
