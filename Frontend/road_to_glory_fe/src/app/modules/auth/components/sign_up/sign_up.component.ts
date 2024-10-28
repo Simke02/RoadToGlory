@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { PersistenceService } from 'src/app/modules/game_object/services/persistence.service';
 
 @Component({
   selector: 'app-sign-up',
@@ -14,7 +15,8 @@ export class SignUpComponent{
 
   constructor(
     private auth_service: AuthService,
-    private router: Router
+    private router: Router,
+    private persistence_service: PersistenceService
   ) {    
       this.signup_form = new FormGroup({
       username: new FormControl(null, [Validators.required]),
@@ -39,9 +41,16 @@ export class SignUpComponent{
       password,
       firstName:first_name,
       lastName:last_name
-    }).subscribe();
-
-    this.router.navigate(['']);
+    }).subscribe({
+      next: () => {
+        this.persistence_service.createStats(username)
+        .subscribe({
+          next: () => {
+            this.router.navigate(['']);
+         }
+        })
+      }
+    });
 
   }
 

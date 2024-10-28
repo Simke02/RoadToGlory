@@ -1,34 +1,32 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
 import { PersistenceService } from './persistence.service';
-import { CreatePersistenceDto } from './dto/create-persistence.dto';
-import { UpdatePersistenceDto } from './dto/update-persistence.dto';
+import { AddStatsDto } from 'src/common/models/dto/add_stats.dto';
 
 @Controller('persistence')
 export class PersistenceController {
   constructor(private readonly persistenceService: PersistenceService) {}
 
-  @Post()
-  create(@Body() createPersistenceDto: CreatePersistenceDto) {
-    return this.persistenceService.create(createPersistenceDto);
+  @Put('addStats')
+  async addStats(@Body() addStatsDto: AddStatsDto){
+    await this.persistenceService.addStats(addStatsDto.won, addStatsDto.lost);
   }
 
-  @Get()
-  findAll() {
-    return this.persistenceService.findAll();
+  @Post('createStats')
+  async createStats(
+    @Body() body: {username: string}
+  ) {
+    await this.persistenceService.createStats(body.username);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.persistenceService.findOne(+id);
+  @Get('userStats/:username')
+  async userStats(
+    @Param('username') username: string
+  ) {
+    return this.persistenceService.userStats(username);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePersistenceDto: UpdatePersistenceDto) {
-    return this.persistenceService.update(+id, updatePersistenceDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.persistenceService.remove(+id);
+  @Get('bestStats')
+  async bestStats() {
+    return this.persistenceService.bestStats();
   }
 }

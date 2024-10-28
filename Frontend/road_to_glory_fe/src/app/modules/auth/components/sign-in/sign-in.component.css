@@ -1,91 +1,104 @@
 .signin-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh; /* Full viewport height */
-    background-color: #f5f5f5; /* Light background for contrast */
-  }
-  
-  .signin-form {
-    width: 100%;
-    max-width: 400px; /* Limit form width */
-    padding: 20px 30px; /* Added more padding to the right and left sides */
-    background-color: white; /* White background for the form */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-    border-radius: 8px; /* Rounded corners for a modern look */
-  }
-  
-  .basic-input {
-    margin-bottom: 15px; /* Spacing between form inputs */
-  }
-  
-  .basic-input label {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 5px;
-    color: #333; /* Darker label color */
-  }
-  
-  .basic-input input {
-    width: 100%;
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc; /* Subtle border */
-    border-radius: 4px; /* Slightly rounded input borders */
-    transition: border-color 0.3s ease;
-  }
-  
-  .basic-input input:focus {
-    border-color: #007bff; /* Blue border on focus */
-    outline: none; /* Remove default focus outline */
-  }
-  
-  button {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  button:disabled {
-    background-color: #ccc; /* Disabled button color */
-    cursor: not-allowed;
-  }
-  
-  button:hover:not(:disabled) {
-    background-color: #0056b3; /* Darker blue on hover */
-  }
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height */
+  background: linear-gradient(135deg, #4a90e2 0%, #50e3c2 100%); /* Cool gradient background */
+  background-size: 400% 400%; /* Makes the gradient more dynamic */
+  animation: gradient 10s ease infinite; /* Animation for the gradient */
+}
 
-  .welcome-sign {
-    text-align: center;
-    font-size: 32px;
-    font-weight: bold;
-    margin-bottom: 30px;
-    color: #333;
-  }
-  
-  .signup-link {
-    text-align: center;
-    margin-top: 15px;
-    font-size: 14px;
-    color: #007bff;
-    cursor: pointer;
-    text-decoration: underline;
-  }
-  
-  .signup-link:hover {
-    color: #0056b3;
-  }
-  
-  .error-message {
-    color: red;
-    font-weight: bold;
-    margin-top: 10px;
-    font-size: 1.1rem;
-    text-align: center;
-  }
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.signin-form {
+  width: 100%;
+  max-width: 400px; /* Limit form width */
+  padding: 30px 40px; /* Added padding for comfort */
+  background: white; /* White background for the form */
+  border-radius: 12px; /* Rounded corners */
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); /* Soft shadow */
+  position: relative; /* For pseudo-element */
+  z-index: 1; /* Ensure form is above the background */
+}
+
+.signin-form h1 {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  color: #004a99; /* Darker blue for the title */
+  margin-bottom: 30px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1); /* Soft shadow */
+}
+
+.basic-input {
+  margin-bottom: 20px; /* Spacing between form inputs */
+}
+
+.basic-input label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+  color: #007bff; /* Bright blue label color */
+}
+
+.basic-input input {
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+  border: 2px solid #007bff; /* Blue border */
+  border-radius: 6px; /* Rounded input borders */
+  transition: border-color 0.3s ease; /* Smooth transition */
+  background-color: #fff; /* White background for inputs */
+}
+
+.basic-input input:focus {
+  border-color: #004a99; /* Darker blue on focus */
+  outline: none; /* Remove default focus outline */
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  background-color: #007bff; /* Bright button background */
+  color: white;
+  border: none;
+  border-radius: 6px; /* More rounded button */
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Smooth background transition */
+}
+
+button:disabled {
+  background-color: #ccc; /* Disabled button color */
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+.signup-link {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 14px;
+  color: #007bff; /* Bright signup link color */
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.3s ease; /* Smooth color transition */
+}
+
+.signup-link:hover {
+  color: #0056b3; /* Darker blue on hover */
+}
+
+.error-message {
+  color: #ff3333; /* Bright red for better visibility */
+  font-weight: bold;
+  margin-top: 10px;
+  font-size: 1.1rem;
+  text-align: center;
+}

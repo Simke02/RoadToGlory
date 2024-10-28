@@ -3,53 +3,73 @@
   justify-content: center;
   align-items: center;
   height: 100vh; /* Full viewport height */
-  background-color: #f5f5f5; /* Light background for contrast */
+  background: linear-gradient(135deg, #4a90e2 0%, #50e3c2 100%); /* Colorful gradient background */
+  background-size: 400% 400%; /* Dynamic gradient */
+  animation: gradient 10s ease infinite; /* Animation for the gradient */
+}
+
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .signup-form {
   width: 100%;
   max-width: 400px; /* Limit form width */
-  padding: 20px 30px; /* Added more padding to the right and left sides */
-  background-color: white; /* White background for the form */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-  border-radius: 8px; /* Rounded corners for a modern look */
+  padding: 30px 40px; /* More padding for comfort */
+  background: white; /* White background for the form */
+  border-radius: 12px; /* Rounded corners */
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); /* Soft shadow */
+  position: relative; /* For pseudo-element */
+  z-index: 1; /* Ensure form is above the background */
+}
+
+.signup-form h1 {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  color: #004a99; /* Darker blue for the title */
+  margin-bottom: 30px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1); /* Soft shadow */
 }
 
 .basic-input {
-  margin-bottom: 15px; /* Spacing between form inputs */
+  margin-bottom: 20px; /* Spacing between form inputs */
 }
 
 .basic-input label {
   font-weight: bold;
   display: block;
   margin-bottom: 5px;
-  color: #333; /* Darker label color */
+  color: #007bff; /* Bright blue label color */
 }
 
 .basic-input input {
   width: 100%;
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid #ccc; /* Subtle border */
-  border-radius: 4px; /* Slightly rounded input borders */
-  transition: border-color 0.3s ease;
+  padding: 12px;
+  font-size: 15px;
+  border: 2px solid #007bff; /* Blue border */
+  border-radius: 6px; /* Rounded input borders */
+  transition: border-color 0.3s ease; /* Smooth transition */
+  background-color: #fff; /* White background for inputs */
 }
 
 .basic-input input:focus {
-  border-color: #007bff; /* Blue border on focus */
+  border-color: #004a99; /* Darker blue on focus */
   outline: none; /* Remove default focus outline */
 }
 
 button {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   font-size: 16px;
-  background-color: #007bff;
+  background-color: #007bff; /* Bright button background */
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px; /* More rounded button */
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease; /* Smooth background transition */
 }
 
 button:disabled {
@@ -59,4 +79,12 @@ button:disabled {
 
 button:hover:not(:disabled) {
   background-color: #0056b3; /* Darker blue on hover */
+}
+
+.error-message {
+  color: #ff3333; /* Bright red for better visibility */
+  font-weight: bold;
+  margin-top: 10px;
+  font-size: 1.1rem;
+  text-align: center;
 }

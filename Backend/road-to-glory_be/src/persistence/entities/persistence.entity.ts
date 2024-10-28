@@ -1,1 +1,3 @@
-export class Persistence {}
+export class Persistence {
+    
+}

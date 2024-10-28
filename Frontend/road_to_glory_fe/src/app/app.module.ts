@@ -10,7 +10,7 @@ import { CommunicationModule } from './modules/communication/communication.modul
 import { ReactiveFormsModule } from '@angular/forms';
 import { JwtInterceptor } from './modules/auth/interceptors/jwt.interceptor';
 //import { authGuard } from './modules/auth/guards/auth.guard';
-import { AuthGuard } from './modules/auth/guards/auth1.guard';
+import { AuthGuard } from './modules/auth/guards/auth.guard';
 
 @NgModule({
   declarations: [

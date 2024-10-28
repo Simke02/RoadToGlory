@@ -17,6 +17,7 @@ import { map, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/modules/auth/services/auth.service';
 import { City } from 'src/app/common/models/city/city.model';
+import { PersistenceService } from '../../services/persistence.service';
 
 @Component({
   selector: 'app-game',
@@ -54,6 +55,7 @@ export class GameComponent implements OnInit, OnDestroy {
   private possible_moves: PositionStep[] = [];
   private selected_unit: Unit = {id: 0, x_coor: -1, y_coor: -1, health: 0, strenght: 0, range: 0, steps: 0, steps_left: 0, upgrade: "", finished_turn: true, icon: ""};
   private selected_cell: {x_coor: number, y_coor: number} = {x_coor: -1, y_coor: -1};
+  private finnished_game: boolean = false;
 
   logged_in: boolean = false;
   logged_in_sub: Subscription;
@@ -70,8 +72,8 @@ export class GameComponent implements OnInit, OnDestroy {
     private game_service: GameService,
     private renderer: Renderer2,
     private el: ElementRef,
-    private current_user_service:CurrentUserService,
-    private router: Router
+    private router: Router,
+    private persistence_service: PersistenceService
   ) {
 
     const potential_room = sessionStorage.getItem("room_id");
@@ -292,16 +294,41 @@ export class GameComponent implements OnInit, OnDestroy {
         this.game_object_service.endGame(this.room)
         .subscribe({
           next: () => {
-            this.router.navigate(['/game_over']);
+            this.persistence_service.addStats({won: message, lost: this.player})
+            .subscribe({
+              next: () => {
+                this.finnished_game = true;
+                this.router.navigate(['/game_over']);
+              }
+            })
           }
         })
       }
     });
 
+    this.communication_service.getSurrendered()
+    .subscribe({
+      next:(loser)=>{
+        sessionStorage.setItem('winner', this.player);
+        this.game_object_service.endGame(this.room)
+        .subscribe({
+          next: () => {
+            this.persistence_service.addStats({won: this.player, lost: loser})
+            .subscribe({
+              next: () => {
+                this.router.navigate(['/game_over']);
+              }
+            })
+          }
+        })
+      }
+    })
+
   }
 
   ngOnDestroy(): void {
     window.removeEventListener('beforeunload', this.unloadNotification);
+    sessionStorage.removeItem('room_id');
   }
 
   getColor(value: string): string {
@@ -540,6 +567,7 @@ export class GameComponent implements OnInit, OnDestroy {
             if(destroy.object.health <= 0){
               this.communication_service.sendEndGame(this.room, this.player);
               sessionStorage.setItem('winner', this.player);
+              this.finnished_game = true;
               this.router.navigate(['/game_over']);
             }
           }
@@ -726,6 +754,12 @@ export class GameComponent implements OnInit, OnDestroy {
     this.removeYellowBorder();
     this.communication_service.sendNextTurn(this.room);
   }
+
+  onSurrenderClick() {
+    //this.surrendered = true;
+    this.communication_service.sendSurrendered(this.room, this.player);
+    this.router.navigate(['/home']);
+  }
   
   removeRedBorders() {
     //3 Sklonimo crvene bordere
@@ -753,13 +787,9 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   unloadNotification(event: BeforeUnloadEvent): void {
-    sessionStorage.removeItem('room_id');
-
-    
-    //Posalji da je drugi pobedio
-    
+    //sessionStorage.removeItem('room_id');
+    //this.communication_service.sendSurrendered(this.room, this.player);
     const confirmationMessage = 'Are you sure you want to leave? Changes you made may not be saved.';
-    this.communication_service.leaveRoom(this.room);
     
     // Standard way to prompt for beforeunload
     event.returnValue = confirmationMessage; // Chrome requires this to be set

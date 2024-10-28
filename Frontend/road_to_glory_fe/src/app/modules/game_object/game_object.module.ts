@@ -13,6 +13,9 @@ import { CurrentUserService } from '../auth/services/current_user.service';
 import { AuthService } from '../auth/services/auth.service';
 import { GameOverComponent } from './components/game_over/game_over.component';
 import { SelectedMenuComponent } from './components/selected_menu/selected_menu.component';
+import { HomeComponent } from './components/home/home.component';
+import { StatsComponent } from './components/stats/stats.component';
+import { PersistenceService } from './services/persistence.service';
 
 
 
@@ -25,7 +28,9 @@ import { SelectedMenuComponent } from './components/selected_menu/selected_menu.
     LobbyComponent,
     AddUpgradeMenuComponent,
     GameOverComponent,
-    SelectedMenuComponent
+    SelectedMenuComponent,
+    HomeComponent,
+    StatsComponent
   ],
   imports: [
     CommonModule
@@ -33,12 +38,7 @@ import { SelectedMenuComponent } from './components/selected_menu/selected_menu.
   providers: [
     GameObjectService,
     GameService,
-    // {
-    //   provide: APP_INITIALIZER,
-    //   useFactory: getUserInfoInitializer,
-    //   deps: [AuthService, CurrentUserService],
-    //   multi: true,
-    // },
+    PersistenceService
   ]
 })
 export class GameObjectModule { }

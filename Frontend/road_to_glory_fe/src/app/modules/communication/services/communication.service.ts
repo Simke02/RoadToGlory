@@ -62,6 +62,10 @@ export class CommunicationService {
     this.socket.emit('endGame', {"room": room, 'winner': winner});
   }
 
+  sendSurrendered(room: string, loser: string): void{
+    this.socket.emit('surrender', {"room": room, "loser": loser});
+  }
+
   //observeri za poruke
   getCreateGame(): Observable<any> {
     return new Observable(observer => {
@@ -205,6 +209,20 @@ export class CommunicationService {
 
       return()=>{
         this.socket.off('onEndGame', listener);
+      };
+    });
+  }
+
+  getSurrendered(): Observable<string>{
+    return new Observable(observer => {
+      const listener = (loser: string)=>{
+        observer.next(loser);
+      };
+
+      this.socket.on('onSurrender', listener);
+
+      return()=>{
+        this.socket.off('onSurrender', listener);
       };
     });
   }

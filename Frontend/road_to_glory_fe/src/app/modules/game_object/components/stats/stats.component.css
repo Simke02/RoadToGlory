@@ -1,0 +1,95 @@
+.stats-container {
+  padding: 30px;
+  max-width: 600px;
+  margin: 20px auto;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  text-align: center;
+  color: #007bff;
+  font-size: 2rem;
+  margin-bottom: 15px;
+}
+
+h2 {
+  margin-top: 30px;
+  color: #333;
+  font-size: 1.5rem;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 10px;
+}
+
+.my-stats {
+  padding: 20px;
+  background-color: #f0f8ff;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.my-stats p {
+  margin: 5px 0;
+  font-size: 1.1rem;
+}
+
+.top-stats {
+  overflow-x: auto; /* Allows horizontal scrolling if necessary */
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+  transition: background-color 0.3s;
+}
+
+th {
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #e0f7fa; /* Light blue on hover */
+}
+
+tr:last-child td {
+  border-bottom: none; /* Remove bottom border from the last row */
+}
+
+.no-stats {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+}
+
+.home-button {
+  display: block;
+  width: 100%; /* Full width */
+  padding: 10px;
+  background-color: #007bff; /* Blue background */
+  color: white; /* White text */
+  border: none;
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Smooth transition */
+  margin-top: 20px; /* Space above the button */
+}
+
+.home-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}

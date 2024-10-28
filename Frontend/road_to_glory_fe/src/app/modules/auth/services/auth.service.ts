@@ -37,4 +37,8 @@ export class AuthService {
       };
       return this.http.get<UserInfo>(environment.baseApiUrl + '/auth/me', httpOptions);
     }
+
+    logout() {
+      sessionStorage.clear();
+    }
 }

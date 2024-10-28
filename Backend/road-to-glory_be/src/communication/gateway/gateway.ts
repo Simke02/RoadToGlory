@@ -167,4 +167,14 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
     ){
         client.broadcast.to(room).emit('onEndGame', winner);
     }
+
+    //surrender
+    @SubscribeMessage('surrender')
+    onSurrender(
+        @MessageBody('room') room :string,
+        @MessageBody('loser') loser: string,
+        @ConnectedSocket() client: Socket
+    ){
+        client.broadcast.to(room).emit('onSurrender', loser);
+    }
 }

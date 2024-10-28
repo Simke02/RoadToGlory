@@ -71,3 +71,21 @@
 .resource p {
     margin: 0; /* Remove default margin from paragraphs */
 }
+
+.bottom-left-button {
+  position: fixed;
+  bottom: 20px;
+  left: 20px; /* Changed from right to left */
+  padding: 10px 20px;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
+}
+
+.bottom-left-button:hover {
+  background-color: darkred;
+}

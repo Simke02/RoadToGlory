@@ -40,7 +40,7 @@ export class SignInComponent {
         
         this.auth_service.logged_in.next(true);
           
-        this.router.navigate(['/lobby'])
+        this.router.navigate(['/home'])
         //this.current_user_service.addCurrentUser(res.me);
       },
       error: err=>{

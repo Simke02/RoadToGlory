@@ -1,0 +1,34 @@
+<div class="stats-container">
+    <h1>Your Stats</h1>
+    <div class="my-stats">
+      <p *ngIf="my_stats; else noStats">
+        <strong>Username:</strong> {{ my_stats.username }}<br>
+        <strong>Wins:</strong> {{ my_stats.won }}<br>
+        <strong>Losses:</strong> {{ my_stats.lost }}<br>
+      </p>
+      <ng-template #noStats>
+        <p class="no-stats">No stats available.</p>
+      </ng-template>
+    </div>
+  
+    <h2>Top 10 Players</h2>
+    <div class="top-stats">
+      <table>
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Wins</th>
+            <th>Losses</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let stat of top_stats">
+            <td>{{ stat.username }}</td>
+            <td>{{ stat.won }}</td>
+            <td>{{ stat.lost }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <button class="home-button" (click)="navigateHome()">Home</button> <!-- Add this button -->
+  </div>

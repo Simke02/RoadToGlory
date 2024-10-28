@@ -49,8 +49,8 @@ export class LobbyComponent implements OnInit, OnDestroy {
   }
 
   unloadNotification(event: BeforeUnloadEvent): void {
-    sessionStorage.removeItem('username')
-    sessionStorage.removeItem('token');
+    //sessionStorage.removeItem('username')
+    //sessionStorage.removeItem('token');
     const confirmationMessage = 'Are you sure you want to leave? Changes you made may not be saved.';
     
     // Standard way to prompt for beforeunload
