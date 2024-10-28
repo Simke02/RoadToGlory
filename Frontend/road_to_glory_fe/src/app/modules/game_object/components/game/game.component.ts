@@ -37,8 +37,8 @@ export class GameComponent implements OnInit, OnDestroy {
   private player_city: City = { x_coor: -1, y_coor: -1, health: 0, icon: ""};
   private enemy_city: City = { x_coor: -1, y_coor: -1, health: 0, icon: ""};
   player_upgrades: Upgrade[] = []; //Koje upgradove ima korisnik i koliko kosta da se postave na jedinicu
-  gold: number = 500;//50;
-  available_resources: {grain: number, iron: number} = {grain: 1000, iron: 1000};
+  gold: number = 50;
+  available_resources: {grain: number, iron: number} = {grain: 100, iron: 100};
   buildings_menu: boolean = false;
   production_menu: boolean = false;
   upgrades_menu: boolean = false;
@@ -118,7 +118,7 @@ export class GameComponent implements OnInit, OnDestroy {
           this.enemy_city = new_game.first_city;
           this.left = false;
           this.my_turn = false;
-          this.gold -= 2;
+          this.gold -= 5;
         }
       }
     })
@@ -270,12 +270,13 @@ export class GameComponent implements OnInit, OnDestroy {
         this.game_object_service.nextTurn({player_name: this.player, left: this.left, room: this.room})
         .subscribe({
           next: () => {
+            console.log(this.left);
             this.my_turn = true;
             this.player_units.forEach(unit => {
               unit.finished_turn = false;
               unit.steps_left = unit.steps;
             });
-            this.gold += 2;
+            this.gold += 5;
             this.player_resource_facilities.forEach(facility => {
               if(facility.type === "iron")
                 this.available_resources.iron += 7;

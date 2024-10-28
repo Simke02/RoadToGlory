@@ -41,17 +41,17 @@ export class GameObjectService {
 
   //Sta moze da bude izgradjeno na jednom polju
   whatCanBeBuilt(x_coor: number, y_coor: number, room: string): {building_names: string[], gold_cost: number[]} {
-    if((this.left && y_coor > 0 && this.maps.getMap(room).getType(x_coor, y_coor-1) === "facility") 
-      || (!this.left && (y_coor + 1) < this.maps.getMap(room).getNumberOfColumns() && this.maps.getMap(room).getType(x_coor, y_coor+1) === "facility")){
+    if((this.left[room] && y_coor > 0 && this.maps.getMap(room).getType(x_coor, y_coor-1) === "facility") 
+      || (!this.left[room] && (y_coor + 1) < this.maps.getMap(room).getNumberOfColumns() && this.maps.getMap(room).getType(x_coor, y_coor+1) === "facility")){
       return {
         building_names: [],
         gold_cost: []
       }
     }
-    
+    console.log(this.left[room]);
     let facilities = {facility_name: [], gold_cost: []}
-    if((this.left && (y_coor + 1) < this.maps.getMap(room).getNumberOfColumns() && (this.maps.getMap(room).getType(x_coor, y_coor + 1) === "" || this.maps.getMap(room).getType(x_coor, y_coor + 1) === "unit"))
-      || (!this.left && y_coor > 0 && (this.maps.getMap(room).getType(x_coor, y_coor - 1) === "" || this.maps.getMap(room).getType(x_coor, y_coor - 1) === "unit"))){
+    if((this.left[room] && (y_coor + 1) < this.maps.getMap(room).getNumberOfColumns() && (this.maps.getMap(room).getType(x_coor, y_coor + 1) === "" || this.maps.getMap(room).getType(x_coor, y_coor + 1) === "unit"))
+      || (!this.left[room] && y_coor > 0 && (this.maps.getMap(room).getType(x_coor, y_coor - 1) === "" || this.maps.getMap(room).getType(x_coor, y_coor - 1) === "unit"))){
       facilities = this.facility_production_service.facilitiesDescription();
     }
     const resource_facilities = this.resource_facility_production_service.resourceFacilitiesDescription();
@@ -124,6 +124,7 @@ export class GameObjectService {
   nextTurn(player: string, left: boolean, room: string){
     this.player[room] = player;
     this.left[room] = left;
+    console.log(left);
   }
 
   //Nesto kao first turn
@@ -139,6 +140,8 @@ export class GameObjectService {
     this.maps.getMap(room).setOwner(12, 2, this.players[room][0]);
     const first_city = new City(12, 2);
     this.player[room] = this.players[room][0];
+    this.left[room] = true;
+    console.log(this.left[room], this.left);
 
     //second player
     this.maps.getMap(room).setType(12, 22, "city");
