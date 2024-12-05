@@ -104,7 +104,7 @@ export class MyGateway implements OnModuleInit, OnGatewayConnection, OnGatewayDi
         @ConnectedSocket() client: Socket
     ){
 
-        client.broadcast.to(room).emit('odDestroy', destroy);
+        client.broadcast.to(room).emit('onDestroy', destroy);
     }
 
     //destroyCity
