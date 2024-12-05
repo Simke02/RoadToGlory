@@ -24,7 +24,7 @@ export class MovementService {
         unit.x_coor = final_position.x_coor;
         unit.y_coor = final_position.y_coor;
         unit.steps_left = final_position.steps_left;
-        if(unit.steps_left === 0)
+        if(unit.steps_left <= 0)
             unit.finished_turn = true;
         this.maps.getMap(room).setOwner(unit.x_coor, unit.y_coor, owner);
         this.maps.getMap(room).setType(unit.x_coor, unit.y_coor, "unit");
